@@ -1,0 +1,47 @@
+{
+  "name": "lumora",
+  "version": "2.0.0",
+  "description": "Lumora AI Health Assistant - An intelligent AI-powered health consultation platform",
+  "author": "Dipanshu Dixit <dipanshudixit206@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/dipanshu-dixit/Lumora",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dipanshu-dixit/Lumora.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dipanshu-dixit/Lumora/issues"
+  },
+  "keywords": [
+    "ai",
+    "health",
+    "consultation",
+    "healthcare",
+    "nextjs",
+    "typescript",
+    "medicine",
+    "wellness"
+  ],
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm run start",
+    "backend": "cd backend && npm run start",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:all": "npm run test && npm run test:e2e"
+  },
+  "dependencies": {
+    "@sentry/nextjs": "^10.32.1"
+  },
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0"
+  }
+}
