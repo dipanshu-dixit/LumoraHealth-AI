@@ -627,7 +627,7 @@ export default function Dashboard() {
               <div className="flex items-center gap-3 mb-4">
                 <Brain className="w-5 h-5 text-purple-400" />
                 <h2 className="text-lg font-medium text-white">Today's Health Check</h2>
-                <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full">
+                <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full hidden sm:inline">
                   {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
               </div>

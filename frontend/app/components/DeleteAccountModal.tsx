@@ -56,7 +56,7 @@ const DeleteAccountModal = React.memo<DeleteAccountModalProps>(({
 								<div className="w-10 h-10 bg-red-500 bg-opacity-20 rounded-full flex items-center justify-center">
 									<AlertTriangle size={20} className="text-red-400" />
 								</div>
-								<h3 className="text-xl font-serif text-black">
+								<h3 className="text-xl font-serif text-white">
 									Delete Account
 								</h3>
 							</div>
@@ -71,7 +71,7 @@ const DeleteAccountModal = React.memo<DeleteAccountModalProps>(({
 						</div>
 
 						<div className="mb-6">
-							<p className="text-black mb-4 leading-relaxed">
+							<p className="text-white mb-4 leading-relaxed">
 								This action is <strong className="text-red-400">irreversible</strong> and will permanently delete all of your consultation history and personal data.
 							</p>
               
@@ -87,7 +87,7 @@ const DeleteAccountModal = React.memo<DeleteAccountModalProps>(({
 						</div>
 
 						<div className="mb-6">
-							<label className="block text-black text-sm font-medium mb-2">
+							<label className="block text-white text-sm font-medium mb-2">
 								Type <span className="text-red-400 font-bold">DELETE</span> to confirm:
 							</label>
 							<input
@@ -104,7 +104,7 @@ const DeleteAccountModal = React.memo<DeleteAccountModalProps>(({
 							<motion.button
 								onClick={onClose}
 								disabled={isDeleting}
-								className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-700 disabled:opacity-50 text-black px-4 py-3 rounded-lg font-medium transition-colors duration-200"
+								className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-700 disabled:opacity-50 text-white px-4 py-3 rounded-lg font-medium transition-colors duration-200"
 								whileHover={!isDeleting ? { scale: 1.02 } : {}}
 								whileTap={!isDeleting ? { scale: 0.98 } : {}}
 							>
@@ -116,7 +116,7 @@ const DeleteAccountModal = React.memo<DeleteAccountModalProps>(({
 								disabled={!canDelete || isDeleting}
 								className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
 									canDelete && !isDeleting
-										? 'bg-red-600 hover:bg-red-700 text-black'
+										? 'bg-red-600 hover:bg-red-700 text-white'
 										: 'bg-gray-600 text-gray-400 cursor-not-allowed'
 								}`}
 								whileHover={canDelete && !isDeleting ? { scale: 1.02 } : {}}

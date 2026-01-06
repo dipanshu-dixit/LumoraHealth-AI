@@ -66,6 +66,17 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({
     return titleMap[pathname] || 'Lumora';
   };
 
+  const getGradientTitle = (title: string) => {
+    if (title === 'Medicine Intelligence') {
+      return (
+        <span>
+          Medicine <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Intelligence</span>
+        </span>
+      );
+    }
+    return title;
+  };
+
   return (
     <div 
       suppressHydrationWarning={true}
@@ -85,8 +96,8 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({
           </svg>
         </motion.button>
         
-        <h1 className="text-lg font-medium text-black hidden sm:block">
-          {pathname === '/' ? (sidebarExpanded ? '' : 'Lumora') : getPageTitle()}
+        <h1 className="text-lg font-medium bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+          {pathname === '/' ? (sidebarExpanded ? '' : 'Lumora') : getGradientTitle(getPageTitle())}
         </h1>
       </div>
 
