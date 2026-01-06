@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Lora } from 'next/font/google'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 import Footer from './components/Footer'
 import MobileDrawer from './components/MobileDrawer'
@@ -82,6 +83,7 @@ export default function RootLayout({
           </div>
           <MobileDrawer />
         </GlobalErrorBoundary>
+        <SpeedInsights />
       </body>
     </html>
   )
