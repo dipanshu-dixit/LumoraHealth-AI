@@ -58,7 +58,7 @@ Be concise and focused. Format response clearly with sections and bullet points.
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "grok-2-vision-1212",
+        model: "grok-4-1-vision",
         messages: [
           { role: "system", content: systemPrompt },
           ...history.slice(-4),

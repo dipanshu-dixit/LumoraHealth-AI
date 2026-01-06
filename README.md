@@ -2,7 +2,7 @@
 
 <div align="center">
   <h3>✨ Privacy-First AI Health Intelligence Platform ✨</h3>
-  <p>Your personal health companion powered by xAI Grok-2</p>
+  <p>Your personal health companion powered by xAI Grok-4</p>
 </div>
 
 ---
@@ -13,7 +13,7 @@ Lumora is a cutting-edge AI health assistant that provides intelligent medical c
 
 ### Key Features
 
-- 🤖 **AI-Powered Consultations** - Advanced health guidance using xAI Grok-2
+- 🤖 **AI-Powered Consultations** - Advanced health guidance using xAI Grok-4
 - 🔒 **Zero-Knowledge Architecture** - All data encrypted and stored locally
 - 💊 **Medicine Intelligence** - Comprehensive drug information and interactions
 - 📊 **Health History** - Track and manage your consultation history
@@ -33,7 +33,7 @@ Lumora is a cutting-edge AI health assistant that provides intelligent medical c
 - **React Hot Toast** - Beautiful notifications
 
 ### AI & APIs
-- **xAI Grok-2** - Latest AI model for health consultations
+- **xAI Grok-4** - Latest AI model for health consultations
 - **AES-256 Encryption** - Military-grade data encryption
 
 ### Storage & Security
@@ -235,7 +235,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📊 Project Stats
 
 - **Version**: 1.1
-- **AI Model**: xAI Grok-2 Latest
+- **AI Model**: xAI Grok-4 Latest
 - **License**: MIT
 - **Status**: Production Ready ✅
 
@@ -243,7 +243,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 💖 Acknowledgments
 
-- xAI for Grok-2 API
+- xAI for Grok-4 API
 - Next.js team for the amazing framework
 - Open source community
 

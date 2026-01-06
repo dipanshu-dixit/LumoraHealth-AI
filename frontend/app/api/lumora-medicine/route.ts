@@ -78,7 +78,7 @@ export async function POST(req: Request) {
         "User-Agent": "Lumora/2.0"
       },
       body: JSON.stringify({
-        model: "grok-2-latest",
+        model: "grok-4-1-fast-reasoning",
         max_tokens: 400,
         temperature: 0.3,
         presence_penalty: 0.5,
