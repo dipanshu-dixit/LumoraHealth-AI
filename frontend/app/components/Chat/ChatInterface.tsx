@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { storage, STORAGE_KEYS } from '../../../src/lib/storage';
 import { ChatStorage } from '../../lib/chatStorage';
 import { sessionManager } from '../../lib/sessionManager';
-import { Plus, Mic, ArrowUp, Paperclip, X, Camera, Pill, FileText, Utensils, User } from 'lucide-react';
+import { Plus, Paperclip, X, Camera, ArrowUp, Pill, FileText, Utensils, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { compressImage, validateImageFile } from '../../lib/imageUtils';
 
@@ -45,6 +45,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const imageMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleNewChat = () => {
@@ -59,6 +60,25 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       window.removeEventListener('lumora_new_chat', handleNewChat);
     };
   }, []);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (imageMenuRef.current && !imageMenuRef.current.contains(event.target as Node)) {
+        setShowImageMenu(false);
+      }
+    };
+
+    if (showImageMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [showImageMenu]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -223,10 +243,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </AnimatePresence>
 
           {/* Main Input Container */}
-          <div className="relative bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 rounded-full px-2 sm:px-4 py-2 sm:py-3 shadow-lg hover:border-zinc-600/50 transition-all duration-200 focus-within:border-white/50/50 focus-within:shadow-white/10/10">
+          <div className="relative bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 rounded-2xl px-2 sm:px-4 py-2 sm:py-3 shadow-lg hover:border-zinc-600/50 transition-all duration-200 focus-within:border-white/50/50 focus-within:shadow-white/10/10">
             <div className="flex items-end gap-1 sm:gap-3">
               {/* Plus Button */}
-              <div className="relative">
+              <div className="relative" ref={imageMenuRef}>
                 <button
                   type="button"
                   onClick={() => setShowImageMenu(!showImageMenu)}
@@ -247,6 +267,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       <div 
                         className="fixed inset-0 z-10" 
                         onClick={() => setShowImageMenu(false)}
+                        onTouchStart={() => setShowImageMenu(false)}
                       />
                       <motion.div
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -302,37 +323,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               />
 
               {/* Right Side Buttons */}
-              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                {/* Mic Button */}
-                <button
-                  type="button"
-                  onClick={() => setIsRecording(!isRecording)}
-                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
-                    isRecording 
-                      ? 'bg-red-500 text-black' 
-                      : 'bg-transparent hover:bg-zinc-700/50 text-zinc-400 hover:text-white'
-                  }`}
-                  disabled={isLoading}
-                >
-                  <Mic size={12} className="sm:w-4 sm:h-4" />
-                </button>
-
+              <div className="flex items-center gap-2 flex-shrink-0">
                 {/* Send Button */}
                 <motion.button
                   type="submit"
                   disabled={!canSubmit}
-                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+                  className={`w-8 h-8 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
                     canSubmit
-                      ? 'bg-white hover:bg-white text-black shadow-lg'
+                      ? 'bg-white hover:bg-zinc-100 text-black shadow-lg'
                       : 'bg-zinc-700 text-zinc-500 cursor-not-allowed'
                   }`}
                   whileHover={canSubmit ? { scale: 1.05 } : {}}
                   whileTap={canSubmit ? { scale: 0.95 } : {}}
                 >
                   {isLoading ? (
-                    <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-zinc-400 border-t-black rounded-full animate-spin" />
                   ) : (
-                    <ArrowUp size={12} className="sm:w-4 sm:h-4" />
+                    <ArrowUp size={16} className="sm:w-4 sm:h-4" />
                   )}
                 </motion.button>
               </div>

@@ -341,7 +341,7 @@ export default function Dashboard() {
     <>
       <NavigationSidebar user={{ name: userName }} />
       
-      <div className="h-full overflow-y-auto bg-[var(--bg-page)] pt-16">
+      <div className="h-full overflow-y-auto bg-[var(--bg-page)] lg:ml-16 transition-all duration-400">
         <Toaster
           position="top-right"
           toastOptions={{

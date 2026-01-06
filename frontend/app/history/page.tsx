@@ -147,8 +147,15 @@ export default function History() {
     <>
       <NavigationSidebar user={{ name: typeof window !== 'undefined' ? localStorage.getItem('lumora-user-name') || 'User' : 'User' }} />
       
-      <div className="h-full overflow-y-auto bg-[var(--bg-page)] flex flex-col pt-16">
-        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 pb-20 lg:pb-8">
+      <div className="h-full overflow-y-auto bg-[var(--bg-page)] flex flex-col lg:ml-16 transition-all duration-400">
+        <div className="px-4 lg:px-6 py-6 pb-20 lg:pb-8">
+          
+          <div className="mb-6">
+            <h1 className="text-2xl md:text-3xl font-light text-white mb-2">
+              Health <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent font-medium">History</span>
+            </h1>
+            <p className="text-zinc-400">Your consultation timeline and health journey</p>
+          </div>
 
           {chatHistory.length > 0 ? (
             <div className="relative">
@@ -325,7 +332,7 @@ export default function History() {
           ) : (
             <div className="text-center py-16">
               <MessageCircle className="w-16 h-16 mx-auto mb-4 text-zinc-600" />
-              <h3 className="text-xl font-light text-white mb-2">No <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent font-medium">consultations</span> yet</h3>
+              <h3 className="text-xl font-light text-white mb-2">No consultations yet</h3>
               <p className="text-zinc-400 mb-6">Start your first health consultation to begin your timeline</p>
               <button
                 onClick={() => router.push('/')}

@@ -52,7 +52,6 @@ export default function Home() {
 	const [isTyping, setIsTyping] = useState(false);
 	const [showScrollButton, setShowScrollButton] = useState(false);
 	const [showBackButton, setShowBackButton] = useState(false);
-	const [sidebarExpanded, setSidebarExpanded] = useState(false);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const chatContainerRef = useRef<HTMLDivElement>(null);
 	const savingRef = useRef(false);
@@ -160,17 +159,10 @@ export default function Home() {
 			setShowBackButton(false);
 		};
 		
-		// Listen for sidebar state changes
-		const handleSidebarChange = (e: CustomEvent) => {
-			setSidebarExpanded(e.detail.expanded);
-		};
-		
 		window.addEventListener('lumora_new_chat', handleNewChat);
-		window.addEventListener('sidebar-state-change', handleSidebarChange as EventListener);
 		
 		return () => {
 			window.removeEventListener('lumora_new_chat', handleNewChat);
-			window.removeEventListener('sidebar-state-change', handleSidebarChange as EventListener);
 		};
 	}, []);
 	
@@ -209,17 +201,16 @@ export default function Home() {
 	}, [onboardingComplete]);
 
 	useEffect(() => {
-		const container = chatContainerRef.current;
-		if (!container) return;
-
-		const isScrolledToBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
-    
-		if (isScrolledToBottom || (messages.length > 0 && !messages[messages.length - 1].isUser)) {
-			setTimeout(() => {
-				messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-			}, 100);
+		if (messages.length > 0) {
+			const lastMessage = messages[messages.length - 1];
+			// Only auto-scroll when user sends a message or AI starts typing
+			if (lastMessage.isUser || isTyping) {
+				setTimeout(() => {
+					messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+				}, 50);
+			}
 		}
-	}, [messages]);
+	}, [messages.length, isTyping]);
 
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -475,7 +466,7 @@ export default function Home() {
 			<NavigationSidebar user={{ name: 'User' }} />
 			
 			{/* Encrypted Status Indicator - Hidden on mobile */}
-			{isHydrated && !sidebarExpanded && (
+			{isHydrated && (
 				<div 
 					className="fixed top-4 z-40 hidden lg:flex items-center gap-2 bg-zinc-900/90 backdrop-blur-sm border border-zinc-700 rounded-full px-3 py-1.5 transition-all duration-400" 
 					style={{ 
@@ -500,13 +491,13 @@ export default function Home() {
 			)}
       
 			<main className="flex flex-col h-screen bg-[var(--bg-page)] overflow-hidden lg:ml-[var(--sidebar-width,64px)] transition-all duration-400">
-				<div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 scroll-smooth pb-56 sm:pb-48 pt-16" onScroll={(e) => {
+				<div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 scroll-smooth pb-56 sm:pb-48 pt-20" onScroll={(e) => {
 					const container = e.currentTarget;
 					const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
 					setShowScrollButton(!isNearBottom);
 				}}>
 
-					<div className="max-w-5xl mx-auto space-y-6 py-6">
+					<div className="max-w-6xl mx-auto space-y-6 py-2">
 						{messages.slice(-50).map((message) => (
 							<div key={message.id} className="max-w-3xl mx-auto">
 								{!message.isUser && message.thinking && (() => {
@@ -666,13 +657,9 @@ export default function Home() {
 						{isTyping && <ThinkingLoader />}
 
 						{messages.length === 0 && (
-							<div className={`max-w-5xl mx-auto space-y-6 lg:space-y-8 py-8 transition-all duration-400 ${
-								sidebarExpanded ? 'max-w-4xl' : 'max-w-5xl'
-							}`}>
+							<div className="max-w-6xl mx-auto space-y-6 lg:space-y-8 py-8 transition-all duration-400">
 								<div className="text-center">
-									<h2 className={`text-xl sm:text-2xl lg:text-3xl font-light text-white mb-2 transition-all duration-400 tracking-tight ${
-										sidebarExpanded ? 'xl:text-3xl' : 'xl:text-4xl'
-									}`}>
+									<h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-light text-white mb-2 transition-all duration-400 tracking-tight">
 										How can I <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent font-medium">help you</span> today?
 									</h2>
 									<p className="text-zinc-400 font-sans text-sm lg:text-base">
@@ -691,7 +678,7 @@ export default function Home() {
 				</div>
 
 				<div className="fixed bottom-0 left-0 right-0 w-full bg-black border-t border-gray-800 p-3 sm:p-6 lg:left-[var(--sidebar-width,64px)] z-30">
-					<div className="max-w-5xl mx-auto">
+					<div className="max-w-6xl mx-auto">
 						<ChatInterface
 							input={input}
 							setInput={setInput}

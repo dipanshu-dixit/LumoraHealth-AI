@@ -33,7 +33,7 @@ export default function SuggestionsGrid({ onQuestionClick }: SuggestionsGridProp
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-20 lg:mb-32">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-20 lg:mb-32">
       {/* Horizontal Scrollable Suggestion Chips */}
       <div className="overflow-x-auto pb-4">
         <div className="flex gap-3 min-w-max justify-center">

@@ -42,7 +42,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
 			const timer = setTimeout(() => setStep(2), 3000);
 			return () => clearTimeout(timer);
 		} else if (step === 2) {
-			const timer = setTimeout(() => setStep(3), 4000);
+			const timer = setTimeout(() => setStep(3), 2500);
 			return () => clearTimeout(timer);
 		}
 		return undefined;
@@ -85,7 +85,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
 									exit={{ opacity: 0, y: -20 }}
 									transition={{ duration: 1 }}
 								>
-									<h1 className="text-4xl text-black font-light leading-relaxed font-serif tracking-wide">
+									<h1 className="text-4xl bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 bg-clip-text text-transparent font-light leading-relaxed font-serif tracking-wide">
 										{content[selectedLanguage].step1}
 									</h1>
 								</motion.div>
@@ -97,9 +97,9 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: -20 }}
-									transition={{ duration: 1 }}
+									transition={{ duration: 0.8 }}
 								>
-									<p className="text-xl text-gray-300 font-light leading-relaxed font-sans whitespace-pre-line">
+									<p className="text-xl bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 bg-clip-text text-transparent font-light leading-relaxed font-sans whitespace-pre-line">
 										{content[selectedLanguage].step2}
 									</p>
 								</motion.div>
@@ -114,7 +114,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
 								>
 									<div className="space-y-8">
 										<div className="text-center">
-											<h2 className="text-3xl font-serif text-black mb-6">
+											<h2 className="text-3xl font-serif bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 bg-clip-text text-transparent mb-6">
 												{content[selectedLanguage].step3.title}
 											</h2>
 											<p className="text-gray-300 text-lg leading-relaxed max-w-lg mx-auto">

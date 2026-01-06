@@ -30,8 +30,8 @@ const DynamicWelcome = React.memo<DynamicWelcomeProps>(({ onComplete }) => {
 			setGreeting('Good night.');
 		}
 
-		// Auto-transition after 4 seconds
-		const timer = setTimeout(onComplete, 4000);
+		// Auto-transition after 3 seconds
+		const timer = setTimeout(onComplete, 3000);
 		return () => clearTimeout(timer);
 	}, [onComplete]);
 
@@ -63,23 +63,23 @@ const DynamicWelcome = React.memo<DynamicWelcomeProps>(({ onComplete }) => {
 
 			{/* Welcome Text */}
 			<div className="relative z-10 text-center">
+				<motion.h2
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 1.2, delay: 0.3, ease: 'easeOut' }}
+					className="text-3xl font-light bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 bg-clip-text text-transparent mb-6"
+				>
+					{greeting}
+				</motion.h2>
+        
 				<motion.h1
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 1.2, delay: 0.5, ease: 'easeOut' }}
-					className="text-4xl font-serif text-black mb-4 leading-relaxed"
-				>
-					{greeting}
-				</motion.h1>
-        
-				<motion.p
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 1.2, delay: 1, ease: 'easeOut' }}
+					transition={{ duration: 1.2, delay: 0.7, ease: 'easeOut' }}
 					className="text-2xl font-sans text-gray-400"
 				>
 					Welcome to Lumora.
-				</motion.p>
+				</motion.h1>
 			</div>
 
 			{/* CSS Animations */}

@@ -34,17 +34,18 @@ const COMMON_MEDICINES = [
 // Medicine-related keywords to detect context
 const MEDICINE_KEYWORDS = [
   'tablet', 'capsule', 'pill', 'medication', 'medicine', 'drug',
-  'mg', 'mcg', 'ml', 'dose', 'dosage', 'prescription',
-  'take', 'taking', 'prescribed', 'recommend', 'try'
+  'mg',  'dosage', 'prescription', 'prescribed'
 ];
 
 // Blacklist of common words that match medicine patterns but aren't medicines
 const BLACKLIST = [
+  'alcohol', 'control', 'protocol', 'patrol', 'petrol', 'symbol',
   'urine', 'routine', 'marine', 'oline', 'oline', 'inine', 'amine',
   'examine', 'determine', 'combine', 'refine', 'define', 'decline',
   'incline', 'outline', 'baseline', 'deadline', 'online', 'offline',
   'sunshine', 'moonshine', 'coastline', 'hairline', 'headline',
-  'pipeline', 'timeline', 'guideline', 'underline', 'streamline'
+  'pipeline', 'timeline', 'guideline', 'underline', 'streamline',
+  'school', 'cool', 'pool', 'tool', 'fool', 'wool', 'stool'
 ];
 
 export const detectMedicines = (text: string): string[] => {
@@ -70,13 +71,20 @@ export const detectMedicines = (text: string): string[] => {
   });
   
   // Smart detection: capitalized words with medicine suffixes
-  const words = text.match(/\b[A-Z][a-z]{3,}(?:ol|pril|statin|mycin|cillin|oxin|azole|mab|tinib|afil|dipine|sartan|olol)\b/g);
+  const words = text.match(/\b[A-Z][a-z]{4,}(?:pril|statin|mycin|cillin|oxin|azole|mab|tinib|afil|dipine|sartan|olol|zole|pine|done|tide)\b/g);
   if (words) {
     words.forEach(word => {
       const lower = word.toLowerCase();
-      // Only add if not in blacklist and not already detected
+      // Only add if not in blacklist, not already detected, and has medicine context nearby
       if (!BLACKLIST.includes(lower) && !detected.has(word) && word.length >= 6) {
-        detected.add(word);
+        // Check if word appears near medicine context
+        const wordIndex = lowerText.indexOf(lower);
+        const contextWindow = lowerText.substring(Math.max(0, wordIndex - 50), wordIndex + word.length + 50);
+        const hasNearbyContext = MEDICINE_KEYWORDS.some(keyword => contextWindow.includes(keyword));
+        
+        if (hasNearbyContext) {
+          detected.add(word);
+        }
       }
     });
   }

@@ -31,10 +31,10 @@ export default function Support() {
     <>
       <NavigationSidebar user={{ name: 'User' }} />
       
-      <div className="h-full overflow-y-auto bg-[var(--bg-page)] pt-16">
-        <div className="w-full max-w-4xl mx-auto px-4 py-2 md:py-6 pb-12">
+      <div className="h-full overflow-y-auto bg-[var(--bg-page)] lg:ml-16 transition-all duration-400">
+        <div className="w-full max-w-4xl mx-auto px-4 py-6 pb-12">
           {/* Hero Section */}
-          <div className="text-center mb-8 md:mb-12 mt-4">
+          <div className="text-center mb-8 md:mb-12">
             <h1 className="text-2xl md:text-4xl font-light text-white mb-4 md:mb-6">How can we <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent font-medium">help?</span></h1>
             
             {/* Search Bar */}

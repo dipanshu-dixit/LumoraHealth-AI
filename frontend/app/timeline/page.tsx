@@ -105,7 +105,7 @@ export default function Timeline() {
       <div class="symptom">
         <h3 style="margin: 0 0 10px 0; text-transform: capitalize;">${s.name}</h3>
         <p style="margin: 5px 0; color: #6b7280;">Occurrences: ${s.dates.length}</p>
-        <p style="margin: 5px 0; color: #6b7280;">Average Severity: ${(s.severity.reduce((a,b) => a+b, 0) / s.severity.length).toFixed(1)}/10</p>
+        <p style="margin: 5px 0; color: #6b7280;">Average Severity: ${Array.isArray(s.severity) && s.severity.length > 0 ? (s.severity.reduce((a,b) => a+b, 0) / s.severity.length).toFixed(1) : 'N/A'}/10</p>
       </div>
     `).join('')}
   </div>

@@ -28,12 +28,12 @@ export default function Terms() {
     <div className="flex h-screen">
       <NavigationSidebar user={{ name: 'User' }} />
       
-      <div className="flex-1 overflow-y-auto bg-[var(--bg-page)] pt-8 pb-20">
+      <div className="flex-1 overflow-y-auto bg-[var(--bg-page)]">
         <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6">
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <FileText className="w-10 h-10 text-purple-400" />
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 bg-clip-text text-transparent">Terms of Service</h1>
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <FileText className="w-8 h-8 text-purple-400" />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 bg-clip-text text-transparent">Terms of Service</h1>
             </div>
             <p className="text-zinc-400">Last updated: January 2, 2026</p>
           </div>

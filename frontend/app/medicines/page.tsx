@@ -103,25 +103,15 @@ function MedicinesContent() {
     <>
       <NavigationSidebar user={{ name: 'User' }} />
       
-      <div className="h-screen overflow-y-auto bg-[var(--bg-page)] lg:ml-[var(--sidebar-width,64px)] transition-all duration-400">
+      <div className="h-screen overflow-y-auto bg-[var(--bg-page)] lg:ml-16 transition-all duration-400">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 pb-32">
           
           {/* Hero Section */}
           <div className="text-center mb-12 lg:mb-16">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-6"
-            >
-              <Sparkles className="w-4 h-4 text-zinc-400" />
-              <span className="text-sm text-zinc-400 font-medium">AI-Powered Medicine Intelligence</span>
-            </motion.div>
-            
             <motion.h1
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl lg:text-5xl font-light text-white mb-4 tracking-tight"
+              className="text-2xl sm:text-4xl lg:text-5xl font-light text-white mb-4 tracking-tight"
             >
               Medicine <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent font-medium">Intelligence</span>
             </motion.h1>
@@ -129,8 +119,8 @@ function MedicinesContent() {
             <motion.p
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-zinc-400 text-lg max-w-2xl mx-auto"
+              transition={{ delay: 0.1 }}
+              className="text-zinc-400 text-sm sm:text-lg max-w-2xl mx-auto"
             >
               Comprehensive medication information, interactions, and safety data at your fingertips
             </motion.p>
@@ -147,25 +137,23 @@ function MedicinesContent() {
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-100" />
                 <div className="relative bg-zinc-900/80 backdrop-blur-xl border border-zinc-800 rounded-2xl overflow-hidden transition-all group-hover:border-white/30">
-                  <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-zinc-500 w-5 h-5 group-hover:text-white transition-colors" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search any medication..."
-                    className="w-full pl-16 pr-32 py-5 bg-transparent text-white placeholder-zinc-500 focus:outline-none text-lg"
+                    className="w-full pl-4 sm:pl-6 pr-16 sm:pr-20 py-3 sm:py-5 bg-transparent text-white placeholder-zinc-500 focus:outline-none text-sm sm:text-lg"
                   />
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white hover:bg-zinc-200 disabled:bg-zinc-800 text-black px-6 py-2.5 rounded-xl transition-all font-medium disabled:text-zinc-600"
+                    className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 text-white p-2.5 sm:p-3 rounded-lg transition-all disabled:text-zinc-500"
                   >
                     {isLoading ? (
-                      <span className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Searching
-                      </span>
-                    ) : 'Search'}
+                      <div className="w-4 h-4 border-2 border-zinc-500 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+                    )}
                   </button>
                 </div>
               </div>

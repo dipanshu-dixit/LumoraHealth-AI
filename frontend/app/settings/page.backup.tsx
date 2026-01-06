@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Download, Trash2, ChevronRight, FileText, Shield, Book, Settings as SettingsIcon, Bell, Phone, Brain, Activity, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
 import DeleteAccountModal from '../components/DeleteAccountModal';
@@ -8,7 +10,7 @@ import AdvancedSettingsModal from '../components/AdvancedSettingsModal';
 import NavigationSidebar from '../components/NavigationSidebar';
 import { useNotifications } from '../hooks/useNotifications';
 import { useUser } from '../hooks/useUser';
-import { Download, Trash2, ChevronRight, FileText, Shield, Book, Settings as SettingsIcon, Bell, Phone } from 'lucide-react';
+
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 export default function Settings() {
@@ -21,40 +23,74 @@ export default function Settings() {
 	const [tempFirstName, setTempFirstName] = useState('');
 	const [tempLastName, setTempLastName] = useState('');
 	const [hasChanges, setHasChanges] = useState(false);
+	const [aiMode, setAiMode] = useState('classic');
+	const [customInstructions, setCustomInstructions] = useState('');
+	const [tempCustomInstructions, setTempCustomInstructions] = useState('');
+	const [hasInstructionChanges, setHasInstructionChanges] = useState(false);
 
 	useEffect(() => {
 		setMounted(true);
 		setTempFirstName(firstName);
 		setTempLastName(lastName);
+
+		setAiMode(storage.get('lumora-ai-mode') || 'classic');
+		const instructions = storage.get('lumora-custom-instructions') || '';
+		setCustomInstructions(instructions);
+		setTempCustomInstructions(instructions);
 	}, [firstName, lastName]);
 
-	const handleSaveName = useCallback(() => {
+
+
+	const handleAiModeChange = (mode: string) => {
+		setAiMode(mode);
+		storage.set('lumora-ai-mode', mode);
+		const modeNames = {
+			classic: 'Classic Mode',
+			medical: 'Medical Professional Mode',
+			chatty: 'Chatty Doctor Mode'
+		};
+		toast.success(`AI Mode: ${modeNames[mode as keyof typeof modeNames]}`, { duration: 2000 });
+	};
+
+	const handleCustomInstructionsChange = (value: string) => {
+		setTempCustomInstructions(value);
+		setHasInstructionChanges(value !== customInstructions);
+	};
+
+	const saveCustomInstructions = () => {
+		setCustomInstructions(tempCustomInstructions);
+		storage.set('lumora-custom-instructions', tempCustomInstructions);
+		setHasInstructionChanges(false);
+		toast.success('Custom instructions saved!', { duration: 2000 });
+	};
+
+	const handleSaveName = () => {
 		setFirstName(tempFirstName);
 		setLastName(tempLastName);
 		setHasChanges(false);
 		toast.success('Name saved successfully!', { duration: 3000 });
-	}, [tempFirstName, tempLastName, setFirstName, setLastName]);
+	};
 
-	const handleFirstNameChange = useCallback((value: string) => {
+	const handleFirstNameChange = (value: string) => {
 		setTempFirstName(value);
 		setHasChanges(value !== firstName || tempLastName !== lastName);
-	}, [firstName, lastName, tempLastName]);
+	};
 
-	const handleLastNameChange = useCallback((value: string) => {
+	const handleLastNameChange = (value: string) => {
 		setTempLastName(value);
 		setHasChanges(tempFirstName !== firstName || value !== lastName);
-	}, [firstName, lastName, tempFirstName]);
+	};
 
-	const escapeHtml = useCallback((text: string) => {
+	const escapeHtml = (text: string) => {
 		return text
 			.replace(/&/g, '&amp;')
 			.replace(/</g, '&lt;')
 			.replace(/>/g, '&gt;')
 			.replace(/"/g, '&quot;')
 			.replace(/'/g, '&#039;');
-	}, []);
+	};
 
-	const handleExportData = useCallback(async () => {
+	const handleExportData = async () => {
 		toast.loading('Preparing your data export...', { id: 'export' });
     
 		const userData = {
@@ -67,6 +103,7 @@ export default function Settings() {
 			chatHistory: typeof window !== 'undefined' ? JSON.parse(storage.get(STORAGE_KEYS.CHAT_HISTORY) || '[]') : []
 		};
 
+		// Create beautiful HTML export
 		const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -142,9 +179,9 @@ export default function Settings() {
 		URL.revokeObjectURL(url);
     
 		toast.success('Data exported! Open the HTML file and print to save as PDF.', { id: 'export', duration: 5000 });
-	}, [fullName, firstName, lastName, escapeHtml]);
+	};
 
-	const handleDeleteAccount = useCallback(() => {
+	const handleDeleteAccount = () => {
 		if (typeof window !== 'undefined') {
 			storage.clear();
 			sessionStorage.clear();
@@ -152,9 +189,9 @@ export default function Settings() {
 		toast.success('All data cleared successfully. Redirecting...', { duration: 3000 });
 		setShowDeleteModal(false);
 		setTimeout(() => window.location.href = '/', 2000);
-	}, []);
+	};
 
-	const handleFactoryReset = useCallback(() => {
+	const handleFactoryReset = () => {
 		if (confirm('⚠️ Factory Reset will restore all settings to default and clear all data. This cannot be undone. Continue?')) {
 			if (typeof window !== 'undefined') {
 				localStorage.clear();
@@ -165,15 +202,15 @@ export default function Settings() {
 			toast.success('Factory reset complete! Reloading...', { duration: 2000 });
 			setTimeout(() => window.location.reload(), 1500);
 		}
-	}, [setFirstName, setLastName]);
+	};
 
-	const legalItems = useMemo(() => [
+	const legalItems = [
 		{ title: 'Privacy Policy', href: '/privacy', icon: Shield },
 		{ title: 'Terms of Service', href: '/terms', icon: FileText },
 		{ title: 'Documentation', href: '/docs', icon: Book },
 		{ title: 'Emergency Contacts', href: '/emergency', icon: Phone },
 		{ title: 'Advanced Settings', action: () => setShowAdvanced(true), icon: SettingsIcon }
-	], []);
+	];
 
 	return (
 		<>
@@ -196,7 +233,12 @@ export default function Settings() {
 					</h1>
 
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-						<div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-xl p-8 hover:bg-zinc-800/80 transition-all">
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3 }}
+							className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-xl p-8 hover:bg-zinc-800/80 transition-all"
+						>
 							<h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6 font-sans">Your Data</h2>
 							
 							<div className="grid md:grid-cols-2 gap-6">
@@ -227,47 +269,121 @@ export default function Settings() {
 									</div>
 									
 									{hasChanges && (
-										<button
+										<motion.button
 											onClick={handleSaveName}
 											className="bg-white hover:bg-zinc-100 text-black px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 font-sans"
+											whileHover={{ scale: 1.02 }}
+											whileTap={{ scale: 0.98 }}
 										>
 											<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
 											</svg>
 											Save Name
-										</button>
+										</motion.button>
 									)}
 								</div>
 								
 								<div className="flex flex-col gap-3">
-									<button
+									<motion.button
 										onClick={handleExportData}
 										className="bg-white hover:bg-zinc-100 text-black px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-3 font-sans"
+										whileHover={{ scale: 1.02 }}
+										whileTap={{ scale: 0.98 }}
 									>
 										<Download className="w-5 h-5" />
 										Export Data
-									</button>
+									</motion.button>
 									
-									<button
+									<motion.button
 										onClick={handleFactoryReset}
 										className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-3 font-sans"
+										whileHover={{ scale: 1.02 }}
+										whileTap={{ scale: 0.98 }}
 									>
 										<SettingsIcon className="w-5 h-5" />
 										Factory Reset
-									</button>
+									</motion.button>
 									
-									<button
+									<motion.button
 										onClick={() => setShowDeleteModal(true)}
 										className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-3 font-sans"
+										whileHover={{ scale: 1.02 }}
+										whileTap={{ scale: 0.98 }}
 									>
 										<Trash2 className="w-5 h-5" />
 										<span className="text-red-100">Delete Account</span>
-									</button>
+									</motion.button>
 								</div>
 							</div>
-						</div>
+						</motion.div>
 
-						<div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 hover:bg-zinc-800/80 transition-all">
+
+
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3, delay: 0.15 }}
+							className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-xl p-8 hover:bg-zinc-800/80 transition-all"
+						>
+							<div className="flex items-center gap-3 mb-6">
+								<Brain className="w-6 h-6 text-white" />
+								<h2 className="text-2xl font-bold text-white font-sans">AI Behavior</h2>
+							</div>
+
+							<div className="grid md:grid-cols-2 gap-6">
+								<div>
+									<div className="flex items-center gap-2 mb-3">
+										<SettingsIcon className="w-5 h-5 text-white" />
+										<label className="text-white font-medium font-sans">Response Mode</label>
+									</div>
+									<select 
+										value={aiMode}
+										onChange={(e) => handleAiModeChange(e.target.value)}
+										className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all font-sans"
+									>
+										<option value="classic">Classic - Balanced responses</option>
+										<option value="medical">Medical Professional - Technical & detailed</option>
+										<option value="chatty">Chatty Doctor - Encouraging & friendly</option>
+									</select>
+								</div>
+
+								<div>
+									<div className="flex items-center gap-2 mb-3">
+										<FileText className="w-5 h-5 text-white" />
+										<label className="text-white font-medium font-sans">Custom Instructions</label>
+									</div>
+									<textarea
+										value={tempCustomInstructions}
+										onChange={(e) => handleCustomInstructionsChange(e.target.value)}
+										placeholder="e.g., I have diabetes, I'm sensitive to light, I prefer natural remedies, I'm a healthcare worker..."
+										rows={4}
+										className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all font-sans resize-none"
+									/>
+									<p className="text-xs text-zinc-500 mt-2">AI will consider these details in all responses</p>
+									
+									{hasInstructionChanges && (
+										<motion.button
+											onClick={saveCustomInstructions}
+											className="bg-white hover:bg-zinc-100 text-black px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 font-sans mt-3"
+											whileHover={{ scale: 1.02 }}
+											whileTap={{ scale: 0.98 }}
+										>
+											<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+											</svg>
+											Save Instructions
+										</motion.button>
+									)}
+								</div>
+							</div>
+						</motion.div>
+
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3, delay: 0.2 }}
+							className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 hover:bg-zinc-800/80 transition-all"
+						>
 							<div className="flex items-center gap-3 mb-6">
 								<Bell className="w-6 h-6 text-white" />
 								<h2 className="text-2xl font-bold text-white font-sans">Notifications</h2>
@@ -291,9 +407,14 @@ export default function Settings() {
 									/>
 								</button>
 							</div>
-						</div>
+						</motion.div>
 
-						<div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:bg-zinc-800/80 transition-all">
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3, delay: 0.2 }}
+							className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:bg-zinc-800/80 transition-all"
+						>
 							<h2 className="text-xl font-bold text-white mb-4 font-sans">Legal & Trust</h2>
 							
 							<div className="space-y-2">
@@ -314,9 +435,14 @@ export default function Settings() {
 									);
 								})}
 							</div>
-						</div>
+						</motion.div>
 
-						<div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:bg-zinc-800/80 transition-all relative">
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3, delay: 0.3 }}
+							className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:bg-zinc-800/80 transition-all relative"
+						>
 							<h2 className="text-xl font-bold text-white mb-4 font-sans">About Lumora</h2>
 							<p className="text-zinc-400 font-sans text-sm leading-relaxed">
 								Lumora AI v1.1 • Powered by xAI Grok-2
@@ -329,27 +455,8 @@ export default function Settings() {
 									© 2026 Lumora AI. All rights reserved.
 								</p>
 							</div>
-						</div>
-
-						<div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:bg-zinc-800/80 transition-all flex items-center justify-center">
-							<span 
-								className="text-6xl font-bold text-white tracking-wide"
-								style={{ fontFamily: 'Brush Script MT, cursive' }}
-							>
-								Lumora
-							</span>
-						</div>
+						</motion.div>
 					</div>
-				</div>
-
-				{/* Lumora Logo at bottom center for mobile */}
-				<div className="flex justify-center py-8 lg:hidden">
-					<span 
-						className="text-4xl font-bold text-white tracking-wide"
-						style={{ fontFamily: 'Brush Script MT, cursive' }}
-					>
-						Lumora
-					</span>
 				</div>
 
 				<DeleteAccountModal

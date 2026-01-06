@@ -35,7 +35,8 @@
     "test:all": "npm run test && npm run test:e2e"
   },
   "dependencies": {
-    "@sentry/nextjs": "^10.32.1"
+    "@sentry/nextjs": "^10.32.1",
+    "@vercel/analytics": "^1.6.1"
   },
   "main": "index.js",
   "directories": {

@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-page: #000000;
+    --bg-sidebar: #000000;
+    --bg-card: #18181b;
+    --bg-input: #27272a;
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1aa;
+    --border-color: #27272a;
+    --accent: #ffffff;
+    --accent-hover: #e5e5e5;
+  }
+
+  /* Optimize font loading */
+  html {
+    font-display: swap;
+  }
+
+  /* Reduce motion for better mobile performance */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Optimize scrolling */
+  * {
+    scroll-behavior: smooth;
+  }
+
+  /* Improve touch targets for mobile */
+  button, 
+  [role="button"], 
+  input[type="submit"], 
+  input[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Optimize text rendering */
+  body {
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  /* Optimized button styles */
+  .btn-primary {
+    @apply bg-white text-black hover:bg-zinc-100 transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-zinc-800 text-white hover:bg-zinc-700 transition-colors duration-200;
+  }
+
+  /* Optimized card styles */
+  .card {
+    @apply bg-zinc-900 border border-zinc-800 rounded-lg;
+  }
+
+  /* Optimized input styles */
+  .input {
+    @apply bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white placeholder-zinc-400 focus:border-white/50 transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  /* Mobile-first responsive utilities */
+  .mobile-safe-area {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Optimized animations - reduced complexity */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  /* Hardware acceleration for smooth animations */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Optimize for mobile touch */
+  .touch-optimized {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+/* Simplified keyframes - removed complex animations */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0); 
+  }
+}
+
+/* Remove the heavy breathe animation - replaced with simple glow */
+.lumora-logo-glow {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Optimize scrollbars for mobile */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Optimize focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Reduce layout shift */
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+/* Optimize for mobile viewport */
+@media (max-width: 768px) {
+  /* Reduce font sizes slightly for mobile */
+  .text-4xl {
+    @apply text-3xl;
+  }
+  
+  .text-3xl {
+    @apply text-2xl;
+  }
+
+  /* Optimize spacing for mobile */
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+
+  /* Reduce padding on mobile */
+  .p-6 {
+    @apply p-4;
+  }
+
+  .px-8 {
+    @apply px-4;
+  }
+}

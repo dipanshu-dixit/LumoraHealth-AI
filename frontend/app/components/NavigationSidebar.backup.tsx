@@ -1,11 +1,14 @@
 /**
- * NavigationSidebar - Optimized for mobile performance
- * Removed heavy Framer Motion animations, added proper memoization
+ * NavigationSidebar - Premium collapsible navigation sidebar
+ * 
+ * Purpose: Central command center for Lumora application navigation
+ * Features: Collapsible design, smooth animations, active state tracking
  */
 
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -38,8 +41,31 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 	const pathname = usePathname();
 	const router = useRouter();
 
-	// Memoize navigation links
-	const navigationLinks = useMemo(() => [
+	useEffect(() => {
+		setMounted(true);
+		const savedState = storage.get(STORAGE_KEYS.SIDEBAR_EXPANDED);
+		const expanded = savedState === 'true';
+		setIsExpanded(expanded);
+		document.documentElement.style.setProperty('--sidebar-width', expanded ? '16rem' : '4rem');
+	}, []);
+
+	useEffect(() => {
+		if (!mounted) return;
+		storage.set(STORAGE_KEYS.SIDEBAR_EXPANDED, String(isExpanded));
+		document.documentElement.style.setProperty('--sidebar-width', isExpanded ? '16rem' : '4rem');
+		window.dispatchEvent(new CustomEvent('sidebar-state-change', { detail: { expanded: isExpanded } }));
+	}, [isExpanded, mounted]);
+
+	const handleNewChat = () => {
+		storage.sessionRemove(SESSION_KEYS.ACTIVE_CHAT_ID);
+		localStorage.removeItem('lumora_active_chat_id');
+		window.dispatchEvent(new Event('lumora_new_chat'));
+		if (window.location.pathname !== '/') {
+			router.push('/');
+		}
+	};
+
+	const navigationLinks = [
 		{
 			href: '/',
 			label: 'Home',
@@ -65,72 +91,48 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 			label: 'Support',
 			icon: LifeBuoy,
 		},
-	], []);
+	];
 
-	const handleNewChat = useCallback(() => {
-		storage.sessionRemove(SESSION_KEYS.ACTIVE_CHAT_ID);
-		localStorage.removeItem('lumora_active_chat_id');
-		window.dispatchEvent(new Event('lumora_new_chat'));
-		if (window.location.pathname !== '/') {
-			router.push('/');
-		}
-	}, [router]);
-
-	const handleToggleExpanded = useCallback(() => {
-		setIsExpanded(prev => !prev);
-	}, []);
-
-	const handleLogout = useCallback(() => {
-		if (confirm('Are you sure you want to logout?')) {
-			storage.clear();
-			window.location.href = '/';
-		}
-	}, []);
-
-	const isActive = useCallback((href: string) => pathname === href, [pathname]);
-
-	useEffect(() => {
-		setMounted(true);
-		const savedState = storage.get(STORAGE_KEYS.SIDEBAR_EXPANDED);
-		const expanded = savedState === 'true';
-		setIsExpanded(expanded);
-		document.documentElement.style.setProperty('--sidebar-width', expanded ? '16rem' : '4rem');
-	}, []);
-
-	useEffect(() => {
-		if (!mounted) return;
-		storage.set(STORAGE_KEYS.SIDEBAR_EXPANDED, String(isExpanded));
-		document.documentElement.style.setProperty('--sidebar-width', isExpanded ? '16rem' : '4rem');
-		window.dispatchEvent(new CustomEvent('sidebar-state-change', { detail: { expanded: isExpanded } }));
-	}, [isExpanded, mounted]);
-
-	if (!mounted) return null;
+	const isActive = (href: string) => pathname === href;
 
 	return (
-		<div
-			className={`fixed left-0 top-0 h-screen bg-[var(--bg-sidebar)] border-r border-[var(--border-color)] z-50 flex-col hidden lg:flex transition-all duration-300 ease-out ${
-				isExpanded ? 'w-64' : 'w-16'
-			}`}
+		<motion.div
+			initial={false}
+			animate={{ width: mounted ? (isExpanded ? '16rem' : '4rem') : '4rem' }}
+			transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+			className="fixed left-0 top-0 h-screen bg-[var(--bg-sidebar)] border-r border-[var(--border-color)] z-50 flex-col hidden lg:flex"
 			suppressHydrationWarning
 		>
 			{/* Brand Logo */}
 			<div className="p-4 border-b border-[var(--border-color)] flex items-center justify-center">
 				<div className="group cursor-pointer flex items-center gap-3">
-					{isExpanded ? (
-						<span
-							className="text-3xl font-bold text-white tracking-wide transition-opacity duration-300"
-							style={{ fontFamily: 'Brush Script MT, cursive' }}
-						>
-							Lumora
-						</span>
-					) : (
-						<span
-							className="text-2xl font-bold text-white transition-opacity duration-300"
-							style={{ fontFamily: 'Brush Script MT, cursive' }}
-						>
-							L
-						</span>
-					)}
+					<AnimatePresence mode="wait">
+						{isExpanded ? (
+							<motion.span
+								key="expanded"
+								initial={{ opacity: 0, scale: 0.8 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.8 }}
+								transition={{ duration: 0.3 }}
+								className="text-3xl font-bold text-white tracking-wide"
+								style={{ fontFamily: 'Brush Script MT, cursive' }}
+							>
+								Lumora
+							</motion.span>
+						) : (
+							<motion.span
+								key="collapsed"
+								initial={{ opacity: 0, scale: 0.8 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.8 }}
+								transition={{ duration: 0.3 }}
+								className="text-2xl font-bold text-white"
+								style={{ fontFamily: 'Brush Script MT, cursive' }}
+							>
+								L
+							</motion.span>
+						)}
+					</AnimatePresence>
 				</div>
 			</div>
 
@@ -146,7 +148,7 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 								<Plus size={20} />
 							</div>
 							{isExpanded && (
-								<span className="font-medium text-sm opacity-100 transition-opacity duration-300">New Chat</span>
+								<span className="font-medium text-sm">New Chat</span>
 							)}
 						</button>
 					</li>
@@ -169,7 +171,7 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 										</div>
                     
 										{isExpanded && (
-											<span className={`font-medium text-sm transition-opacity duration-300 ${active ? 'text-white drop-shadow-sm' : ''}`}>
+											<span className={`font-medium text-sm ${active ? 'text-white drop-shadow-sm' : ''}`}>
 												{link.label}
 											</span>
 										)}
@@ -187,10 +189,10 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 				<div className="mb-4 p-3 bg-[var(--bg-card)] rounded-lg">
 					{isExpanded ? (
 						<div className="flex items-center space-x-3">
-							<UserAvatar size="sm" />
+							{mounted && <UserAvatar size="sm" />}
 							<div className="flex-1 min-w-0 flex flex-col justify-center">
 								<p className="text-[var(--text-primary)] text-sm font-medium truncate">
-									{fullName}
+									{mounted ? fullName : 'User'}
 								</p>
 								<p className="text-[var(--text-secondary)] text-xs">
 									Free Plan
@@ -204,7 +206,7 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 						</div>
 					) : (
 						<div className="flex flex-col items-center gap-2">
-							<UserAvatar size="sm" />
+							{mounted && <UserAvatar size="sm" />}
 							<Link href="/settings">
 								<button className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-all">
 									<Settings size={20} />
@@ -217,11 +219,16 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 				{/* Logout Button */}
 				<button
 					className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-[var(--text-secondary)] hover:text-red-400 hover:bg-red-500 hover:bg-opacity-10 transition-colors duration-200"
-					onClick={handleLogout}
+					onClick={() => {
+						if (confirm('Are you sure you want to logout?')) {
+							storage.clear();
+							window.location.href = '/';
+						}
+					}}
 				>
 					<LogOut size={20} className="flex-shrink-0" />
 					{isExpanded && (
-						<span className="font-medium text-sm transition-opacity duration-300">
+						<span className="font-medium text-sm">
 							Logout
 						</span>
 					)}
@@ -229,14 +236,14 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 
 				{/* Expand/Collapse Toggle */}
 				<button
-					onClick={handleToggleExpanded}
+					onClick={() => setIsExpanded(!isExpanded)}
 					className="w-full flex items-center justify-center mt-4 p-2 rounded-lg text-[var(--text-secondary)] hover:text-black hover:bg-white/10 hover:bg-opacity-10 transition-colors duration-200"
 					suppressHydrationWarning
 				>
 					{isExpanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
 				</button>
 			</div>
-		</div>
+		</motion.div>
 	);
 });
 

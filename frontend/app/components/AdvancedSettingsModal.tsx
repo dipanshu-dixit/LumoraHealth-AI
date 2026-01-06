@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Shield, Lock, CheckCircle, XCircle, AlertTriangle, Zap, Database, Code, Settings } from 'lucide-react';
+import { X, Shield, Lock, CheckCircle, XCircle, AlertTriangle, Zap, Database, Code, Settings, Bell } from 'lucide-react';
 import { secureStorage } from '@/lib/secureStorage';
-import { storage } from '@/lib/storage';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 import toast from 'react-hot-toast';
 import StorageUsageCard from './StorageUsageCard';
 
@@ -23,6 +23,8 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
   const [enableMarkdown, setEnableMarkdown] = useState(true);
   const [enableAnimations, setEnableAnimations] = useState(true);
   const [enableReasoning, setEnableReasoning] = useState(false);
+  const [autoDeleteDays, setAutoDeleteDays] = useState(30);
+  const [messageLimit, setMessageLimit] = useState(50);
 
   useEffect(() => {
     if (isOpen) {
@@ -32,6 +34,8 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
       setEnableMarkdown(storage.get('lumora-enable-markdown') !== 'false');
       setEnableAnimations(storage.get('lumora-enable-animations') !== 'false');
       setEnableReasoning(storage.get('lumora-enable-reasoning') === 'true');
+      setAutoDeleteDays(parseInt(storage.get('lumora-auto-delete-days') || '30'));
+      setMessageLimit(parseInt(storage.get('lumora-message-limit') || '50'));
     }
   }, [isOpen]);
 
@@ -98,6 +102,28 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
     toast.success(newValue ? 'AI Reasoning enabled' : 'AI Reasoning disabled');
   };
 
+  const handleAutoDeleteChange = (days: number) => {
+    setAutoDeleteDays(days);
+    storage.set('lumora-auto-delete-days', days.toString());
+    toast.success(`Auto-delete set to ${days} days`, { duration: 2000 });
+    
+    // Clean old messages immediately
+    const chats = JSON.parse(storage.get(STORAGE_KEYS.CHAT_HISTORY) || '[]');
+    const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const filteredChats = chats.filter((chat: any) => new Date(chat.timestamp) > cutoffDate);
+    
+    if (filteredChats.length !== chats.length) {
+      storage.set(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(filteredChats));
+      toast.success(`Deleted ${chats.length - filteredChats.length} old conversations`, { duration: 3000 });
+    }
+  };
+
+  const handleMessageLimitChange = (limit: number) => {
+    setMessageLimit(limit);
+    storage.set('lumora-message-limit', limit.toString());
+    toast.success(`Message limit set to ${limit}`, { duration: 2000 });
+  };
+
   return (
     <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -114,6 +140,134 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
         <div className="p-6 space-y-6">
           {/* Storage Usage Section */}
           <StorageUsageCard />
+
+          {/* Storage & Privacy Section */}
+          <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Shield className="w-5 h-5 text-white" />
+              <h3 className="text-lg font-semibold text-white">Storage & Privacy</h3>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Bell className="w-5 h-5 text-white" />
+                  <label className="text-white font-medium">Auto-Delete Messages</label>
+                </div>
+                <select 
+                  value={autoDeleteDays}
+                  onChange={(e) => handleAutoDeleteChange(parseInt(e.target.value))}
+                  className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all"
+                >
+                  <option value={7}>7 days</option>
+                  <option value={30}>30 days</option>
+                  <option value={90}>90 days</option>
+                  <option value={365}>1 year</option>
+                  <option value={99999}>Never</option>
+                </select>
+                <p className="text-xs text-zinc-500 mt-2">Conversations older than this will be automatically deleted</p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Settings className="w-5 h-5 text-white" />
+                  <label className="text-white font-medium">Message Storage Limit</label>
+                </div>
+                <select 
+                  value={messageLimit}
+                  onChange={(e) => handleMessageLimitChange(parseInt(e.target.value))}
+                  className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all"
+                >
+                  <option value={25}>25 messages per chat</option>
+                  <option value={50}>50 messages per chat</option>
+                  <option value={100}>100 messages per chat</option>
+                  <option value={200}>200 messages per chat</option>
+                </select>
+                <p className="text-xs text-zinc-500 mt-2"><Shield className="w-3 h-3 inline mr-1" />Higher limits may slow down the app. Recommended: 50 messages</p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="w-4 h-4 text-emerald-400" />
+                  <span className="text-xs text-zinc-400 font-medium">STORAGE TYPE</span>
+                </div>
+                <p className="text-white font-medium">Local Device</p>
+                <p className="text-xs text-zinc-500 mt-1">100% Private</p>
+              </div>
+              
+              <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="w-4 h-4 text-blue-400" />
+                  <span className="text-xs text-zinc-400 font-medium">CAPACITY</span>
+                </div>
+                <p className="text-white font-medium">5-10 MB</p>
+                <p className="text-xs text-zinc-500 mt-1">Browser Limit</p>
+              </div>
+              
+              <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className={`w-4 h-4 ${autoDeleteDays >= 99999 ? 'text-zinc-500' : 'text-purple-400'}`} />
+                  <span className="text-xs text-zinc-400 font-medium">AUTO-CLEAN</span>
+                </div>
+                <p className="text-white font-medium">{autoDeleteDays >= 99999 ? 'Disabled' : 'Enabled'}</p>
+                <p className="text-xs text-zinc-500 mt-1">{autoDeleteDays >= 99999 ? 'Manual Only' : 'Optimized'}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* AI Behavior Section */}
+          <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Settings className="w-5 h-5 text-white" />
+              <h3 className="text-lg font-semibold text-white">AI Behavior</h3>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Settings className="w-5 h-5 text-white" />
+                  <label className="text-white font-medium">Response Mode</label>
+                </div>
+                <select 
+                  value={storage.get('lumora-ai-mode') || 'classic'}
+                  onChange={(e) => {
+                    storage.set('lumora-ai-mode', e.target.value);
+                    const modeNames = {
+                      classic: 'Classic Mode',
+                      medical: 'Medical Professional Mode',
+                      chatty: 'Chatty Doctor Mode'
+                    };
+                    toast.success(`AI Mode: ${modeNames[e.target.value as keyof typeof modeNames]}`, { duration: 2000 });
+                  }}
+                  className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all"
+                >
+                  <option value="classic">Classic - Balanced responses</option>
+                  <option value="medical">Medical Professional - Technical & detailed</option>
+                  <option value="chatty">Chatty Doctor - Encouraging & friendly</option>
+                </select>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Code className="w-5 h-5 text-white" />
+                  <label className="text-white font-medium">Custom Instructions</label>
+                </div>
+                <textarea
+                  defaultValue={storage.get('lumora-custom-instructions') || ''}
+                  onChange={(e) => {
+                    storage.set('lumora-custom-instructions', e.target.value);
+                    toast.success('Custom instructions updated!', { duration: 2000 });
+                  }}
+                  placeholder="e.g., I have diabetes, I'm sensitive to light, I prefer natural remedies, I'm a healthcare worker..."
+                  rows={4}
+                  className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all resize-none"
+                />
+                <p className="text-xs text-zinc-500 mt-2">AI will consider these details in all responses</p>
+              </div>
+            </div>
+          </div>
 
           {/* AI Parameters Section */}
           <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-6">

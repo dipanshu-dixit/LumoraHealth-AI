@@ -122,10 +122,10 @@ export default function Privacy() {
         }}
       />
       
-      <div className="flex-1 overflow-y-auto bg-[var(--bg-page)] pt-8 pb-20">
+      <div className="flex-1 overflow-y-auto bg-[var(--bg-page)]">
         <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent mb-4">Privacy & Data Control</h1>
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent mb-3">Privacy & Data Control</h1>
             <p className="text-zinc-400">Last updated: January 2, 2026</p>
           </div>
           
@@ -174,7 +174,7 @@ export default function Privacy() {
               <div className="space-y-3 text-zinc-300">
                 <p>When you send a message:</p>
                 <ul className="list-disc list-inside space-y-2 ml-4 text-zinc-400">
-                  <li><strong className="text-white">AI Model:</strong> xAI Grok-2 (via OpenRouter API)</li>
+                  <li><strong className="text-white">AI Model:</strong> xAI Grok-2 (via xAI API)</li>
                   <li><strong className="text-white">Data Sent:</strong> Only your current message and conversation context</li>
                   <li><strong className="text-white">Encryption:</strong> All API requests use HTTPS/TLS encryption</li>
                   <li><strong className="text-white">No Personal Info:</strong> No names, emails, or identifiers sent to AI</li>
