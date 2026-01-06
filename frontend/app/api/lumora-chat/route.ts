@@ -148,7 +148,7 @@ ${validatedData.adaptiveProfile.topicsOfInterest.length > 0 ? `- Topics of inter
         "X-Title": "Lumora AI Health Assistant"
       },
       body: JSON.stringify({
-        model: "grok-2-latest",
+        model: "grok-2-1212",
         messages: messagesPayload,
         max_tokens: validatedData.maxTokens || 450,
         temperature: validatedData.temperature || 0.5,
