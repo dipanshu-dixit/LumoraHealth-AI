@@ -123,7 +123,7 @@ export default function Privacy() {
       />
       
       <div className="flex-1 overflow-y-auto bg-[var(--bg-page)]">
-        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 pb-32 lg:pb-40">
+        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 pb-32 lg:pb-40 mt-16">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent mb-3">Privacy & Data Control</h1>
             <p className="text-zinc-400">Last updated: January 2, 2026</p>

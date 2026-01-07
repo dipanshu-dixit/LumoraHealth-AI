@@ -104,7 +104,7 @@ function MedicinesContent() {
       <NavigationSidebar user={{ name: 'User' }} />
       
       <div className="h-screen overflow-y-auto bg-[var(--bg-page)] lg:ml-16 transition-all duration-400">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 pb-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 pb-32 mt-16">
           
           {/* Hero Section */}
           <div className="text-center mb-12 lg:mb-16">

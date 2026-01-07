@@ -29,7 +29,7 @@ export default function Terms() {
       <NavigationSidebar user={{ name: 'User' }} />
       
       <div className="flex-1 overflow-y-auto bg-[var(--bg-page)]">
-        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 pb-40">
+        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 pb-40 mt-16">
           <div className="text-center mb-6">
             <div className="flex items-center justify-center gap-2 mb-3">
               <FileText className="w-8 h-8 text-purple-400" />
