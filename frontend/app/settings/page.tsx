@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
 import DeleteAccountModal from '../components/DeleteAccountModal';
+import AdvancedAccess from '../components/AdvancedAccess';
 import AdvancedSettingsModal from '../components/AdvancedSettingsModal';
 import NavigationSidebar from '../components/NavigationSidebar';
 import { useNotifications } from '../hooks/useNotifications';
@@ -17,15 +18,28 @@ export default function Settings() {
 	const { notificationsEnabled, toggleNotifications, mounted: notificationsMounted } = useNotifications();
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showAdvanced, setShowAdvanced] = useState(false);
+	const [showAdvancedAccess, setShowAdvancedAccess] = useState(false);
+	const [hasAdvancedAccess, setHasAdvancedAccess] = useState(false);
 	const [mounted, setMounted] = useState(false);
 	const [tempFirstName, setTempFirstName] = useState('');
 	const [tempLastName, setTempLastName] = useState('');
 	const [hasChanges, setHasChanges] = useState(false);
+	const [largeText, setLargeText] = useState(false);
 
 	useEffect(() => {
 		setMounted(true);
 		setTempFirstName(firstName);
 		setTempLastName(lastName);
+		const isLargeText = localStorage.getItem('lumora-large-text') === 'true';
+		setLargeText(isLargeText);
+		// Apply large text on load
+		if (isLargeText) {
+			document.documentElement.classList.add('large-text');
+		}
+		
+		// Check advanced access
+		const advancedAccess = localStorage.getItem('lumora-advanced-access');
+		setHasAdvancedAccess(advancedAccess === 'approved');
 	}, [firstName, lastName]);
 
 	const handleSaveName = useCallback(() => {
@@ -98,12 +112,28 @@ export default function Settings() {
 		}
 	}, [setFirstName, setLastName]);
 
+	const toggleLargeText = useCallback(() => {
+		const newValue = !largeText;
+		setLargeText(newValue);
+		localStorage.setItem('lumora-large-text', newValue.toString());
+		// Apply to document root for global effect
+		if (newValue) {
+			document.documentElement.classList.add('large-text');
+		} else {
+			document.documentElement.classList.remove('large-text');
+		}
+		toast.success(newValue ? 'Large text enabled' : 'Default text size');
+	}, [largeText]);
 	const legalItems = useMemo(() => [
 		{ title: 'Privacy Policy', href: '/privacy', icon: Shield },
 		{ title: 'Terms of Service', href: '/terms', icon: FileText },
 		{ title: 'Documentation', href: '/docs', icon: Book },
 		{ title: 'Emergency Contacts', href: '/emergency', icon: Phone },
-		{ title: 'Advanced Settings', action: () => setShowAdvanced(true), icon: SettingsIcon }
+		{ 
+			title: 'Advanced Settings', 
+			action: () => hasAdvancedAccess ? setShowAdvanced(true) : setShowAdvancedAccess(true), 
+			icon: SettingsIcon 
+		}
 	], []);
 
 	return (
@@ -127,10 +157,11 @@ export default function Settings() {
 					</h1>
 
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-						<div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-xl p-8 hover:bg-zinc-800/80 transition-all">
-							<h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6 font-sans">Your Data</h2>
-							
-							<div className="grid md:grid-cols-2 gap-6">
+						<div className="lg:col-span-2 space-y-6">
+							{/* User Data Section */}
+							<div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 hover:bg-zinc-800/80 transition-all">
+								<h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6 font-sans">Your Data</h2>
+								
 								<div className="space-y-4">
 									<div>
 										<label className="block text-[var(--text-primary)] text-sm font-medium mb-3 font-sans">
@@ -157,23 +188,25 @@ export default function Settings() {
 										/>
 									</div>
 									
-									{/* Reserve space for save button to prevent layout shift */}
-									<div className="h-12">
-										{hasChanges && (
-											<button
-												onClick={handleSaveName}
-												className="bg-white hover:bg-zinc-100 text-black px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 font-sans h-12"
-											>
-												<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-												</svg>
-												Save
-											</button>
-										)}
-									</div>
+									{hasChanges && (
+										<button
+											onClick={handleSaveName}
+											className="bg-white hover:bg-zinc-100 text-black px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 font-sans"
+										>
+											<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+											</svg>
+											Save
+										</button>
+									)}
 								</div>
+							</div>
+
+							{/* Data Actions Section */}
+							<div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 hover:bg-zinc-800/80 transition-all">
+								<h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6 font-sans">Data Management</h2>
 								
-								<div className="flex flex-col gap-3 min-h-[180px]">
+								<div className="flex flex-col gap-3">
 									<button
 										onClick={handleExportData}
 										className="bg-white hover:bg-zinc-100 text-black px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-3 font-sans h-12"
@@ -207,23 +240,43 @@ export default function Settings() {
 								<h2 className="text-2xl font-bold text-white font-sans">Notifications</h2>
 							</div>
 
-							<div>
-								<div className="flex items-center gap-2 mb-3">
-									<Bell className="w-5 h-5 text-white" />
-									<label className="text-white font-medium font-sans">Daily Check-ins</label>
-								</div>
-								{/* Reserve space for toggle to prevent layout shift */}
-								<div className="h-6">
+							<div className="space-y-4">
+								<div className="flex items-center justify-between py-3">
+									<div>
+										<p className="text-white font-medium font-sans">Daily Check-ins</p>
+										<p className="text-zinc-400 text-sm">Get health reminders</p>
+									</div>
 									{mounted && notificationsMounted && (
 										<button
 											onClick={toggleNotifications}
-											className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black ${
-												notificationsEnabled ? 'bg-teal-500' : 'bg-zinc-700'
+											className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
+												notificationsEnabled ? 'bg-teal-500' : 'bg-zinc-600'
 											}`}
 										>
 											<span
-												className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-													notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
+												className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+													notificationsEnabled ? 'translate-x-5' : 'translate-x-0'
+												}`}
+											/>
+										</button>
+									)}
+								</div>
+
+								<div className="flex items-center justify-between py-3">
+									<div>
+										<p className="text-white font-medium font-sans">Large Text</p>
+										<p className="text-zinc-400 text-sm">Better accessibility</p>
+									</div>
+									{mounted && (
+										<button
+											onClick={toggleLargeText}
+											className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
+												largeText ? 'bg-teal-500' : 'bg-zinc-600'
+											}`}
+										>
+											<span
+												className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+													largeText ? 'translate-x-5' : 'translate-x-0'
 												}`}
 											/>
 										</button>
@@ -286,6 +339,15 @@ export default function Settings() {
 					isOpen={showDeleteModal}
 					onClose={() => setShowDeleteModal(false)}
 					onConfirm={handleDeleteAccount}
+				/>
+				<AdvancedAccess
+					isOpen={showAdvancedAccess}
+					onClose={() => setShowAdvancedAccess(false)}
+					onAccessGranted={() => {
+						setHasAdvancedAccess(true);
+						setShowAdvancedAccess(false);
+						setShowAdvanced(true);
+					}}
 				/>
 				<AdvancedSettingsModal
 					isOpen={showAdvanced}

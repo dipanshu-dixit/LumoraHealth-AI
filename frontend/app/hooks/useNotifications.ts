@@ -31,7 +31,7 @@ export function useNotifications() {
             toast.error('Notification permission denied. Please enable in browser settings.');
           }
         } catch (error) {
-          toast.error('Failed to request notification permission.');
+          // Remove this error toast
         }
       } else {
         toast.error('Notifications not supported on this device.');

@@ -459,7 +459,7 @@ export default function Home() {
 			<main className="flex flex-col h-screen bg-[var(--bg-page)] overflow-hidden lg:ml-[var(--sidebar-width,64px)] transition-all duration-400">
 				<div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 scroll-smooth pb-56 sm:pb-48 pt-20" onScroll={handleScroll}>
 
-					<div className="max-w-6xl mx-auto space-y-6 py-2">
+					<div className="max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto space-y-6 py-2">
 						{visibleMessages.map((message) => (
 							<div key={message.id} className="max-w-3xl mx-auto">
 								{!message.isUser && message.thinking && (() => {
@@ -615,7 +615,7 @@ export default function Home() {
 						{isTyping && <ThinkingLoader />}
 
 						{messages.length === 0 && (
-							<div className="max-w-6xl mx-auto space-y-6 lg:space-y-8 py-8 transition-all duration-400">
+							<div className="max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto space-y-6 lg:space-y-8 py-8 transition-all duration-400">
 								<div className="text-center">
 									<h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-light text-white mb-2 transition-all duration-400 tracking-tight">
 										How can I <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent font-medium">help you</span> today?
@@ -636,7 +636,7 @@ export default function Home() {
 				</div>
 
 				<div className="fixed bottom-0 left-0 right-0 w-full bg-black border-t border-gray-800 p-3 sm:p-6 lg:left-[var(--sidebar-width,64px)] z-30">
-					<div className="max-w-6xl mx-auto">
+					<div className="max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
 						<ChatInterface
 							input={input}
 							setInput={setInput}

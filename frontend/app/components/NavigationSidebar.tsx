@@ -94,13 +94,13 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 		const savedState = storage.get(STORAGE_KEYS.SIDEBAR_EXPANDED);
 		const expanded = savedState === 'true';
 		setIsExpanded(expanded);
-		document.documentElement.style.setProperty('--sidebar-width', expanded ? '16rem' : '4rem');
+		document.documentElement.style.setProperty('--sidebar-width', expanded ? '16rem' : '6rem');
 	}, []);
 
 	useEffect(() => {
 		if (!mounted) return;
 		storage.set(STORAGE_KEYS.SIDEBAR_EXPANDED, String(isExpanded));
-		document.documentElement.style.setProperty('--sidebar-width', isExpanded ? '16rem' : '4rem');
+		document.documentElement.style.setProperty('--sidebar-width', isExpanded ? '16rem' : '6rem');
 		window.dispatchEvent(new CustomEvent('sidebar-state-change', { detail: { expanded: isExpanded } }));
 	}, [isExpanded, mounted]);
 
@@ -109,13 +109,13 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 	return (
 		<div
 			className={`fixed left-0 top-0 h-screen bg-[var(--bg-sidebar)] border-r border-[var(--border-color)] z-50 flex-col hidden lg:flex transition-all duration-300 ease-out ${
-				isExpanded ? 'w-64' : 'w-16'
+				isExpanded ? 'w-64' : 'w-24'
 			}`}
 			suppressHydrationWarning
 		>
 			{/* Brand Logo */}
 			<div className="p-4 border-b border-[var(--border-color)] flex items-center justify-center">
-				<div className="group cursor-pointer flex items-center gap-3">
+				<div className="group cursor-pointer flex items-center justify-center w-full">
 					{isExpanded ? (
 						<span
 							className="text-3xl font-bold text-white tracking-wide transition-opacity duration-300"
@@ -124,12 +124,15 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 							Lumora
 						</span>
 					) : (
-						<span
-							className="text-2xl font-bold text-white transition-opacity duration-300"
-							style={{ fontFamily: 'Brush Script MT, cursive' }}
-						>
-							L
-						</span>
+						<div className="flex flex-col items-center justify-center">
+							<span
+								className="text-2xl font-bold text-white transition-opacity duration-300"
+								style={{ fontFamily: 'Brush Script MT, cursive' }}
+							>
+								L
+							</span>
+							<div className="w-8 h-0.5 bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full mt-1"></div>
+						</div>
 					)}
 				</div>
 			</div>
@@ -145,8 +148,12 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 							<div className="flex items-center justify-center w-6 h-6 mr-3">
 								<Plus size={20} />
 							</div>
-							{isExpanded && (
+							{isExpanded ? (
 								<span className="font-medium text-sm opacity-100 transition-opacity duration-300">New Chat</span>
+							) : (
+								<div className="absolute left-full ml-2 px-2 py-1 bg-zinc-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+									New Chat
+								</div>
 							)}
 						</button>
 					</li>
@@ -168,10 +175,14 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 											<Icon size={20} className={`${active ? 'text-white drop-shadow-sm' : ''}`} />
 										</div>
                     
-										{isExpanded && (
+										{isExpanded ? (
 											<span className={`font-medium text-sm transition-opacity duration-300 ${active ? 'text-white drop-shadow-sm' : ''}`}>
 												{link.label}
 											</span>
+										) : (
+											<div className="absolute left-full ml-2 px-2 py-1 bg-zinc-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+												{link.label}
+											</div>
 										)}
 									</div>
 								</Link>
@@ -203,11 +214,11 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 							</Link>
 						</div>
 					) : (
-						<div className="flex flex-col items-center gap-2">
+						<div className="flex flex-col items-center gap-3">
 							<UserAvatar size="sm" />
 							<Link href="/settings">
-								<button className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-all">
-									<Settings size={20} />
+								<button className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-all flex items-center justify-center w-10 h-10">
+									<Settings size={18} />
 								</button>
 							</Link>
 						</div>
@@ -216,14 +227,18 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 
 				{/* Logout Button */}
 				<button
-					className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-[var(--text-secondary)] hover:text-red-400 hover:bg-red-500 hover:bg-opacity-10 transition-colors duration-200"
+					className="w-full flex items-center justify-center px-3 py-2 rounded-lg text-[var(--text-secondary)] hover:text-red-400 hover:bg-red-500 hover:bg-opacity-10 transition-colors duration-200 group relative"
 					onClick={handleLogout}
 				>
 					<LogOut size={20} className="flex-shrink-0" />
-					{isExpanded && (
-						<span className="font-medium text-sm transition-opacity duration-300">
+					{isExpanded ? (
+						<span className="font-medium text-sm transition-opacity duration-300 ml-3">
 							Logout
 						</span>
+					) : (
+						<div className="absolute left-full ml-2 px-2 py-1 bg-zinc-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+							Logout
+						</div>
 					)}
 				</button>
 

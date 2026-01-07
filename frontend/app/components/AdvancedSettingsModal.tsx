@@ -27,6 +27,7 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
   const [messageLimit, setMessageLimit] = useState(50);
   const [customInstructions, setCustomInstructions] = useState('');
   const [hasInstructionsChanges, setHasInstructionsChanges] = useState(false);
+  const [hasParameterChanges, setHasParameterChanges] = useState(false);
   
   // Debounce refs for notifications
   const tokenTimeoutRef = useRef<NodeJS.Timeout>();
@@ -36,33 +37,29 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
 
   const handleMaxTokensChange = useCallback((value: number) => {
     setMaxTokens(value);
-    storage.set('lumora-max-tokens', value.toString());
-    
-    if (tokenTimeoutRef.current) clearTimeout(tokenTimeoutRef.current);
-    tokenTimeoutRef.current = setTimeout(() => {
-      toast.success(`Max tokens set to ${value}`);
-    }, 500);
+    const original = parseInt(storage.get('lumora-max-tokens') || '450');
+    setHasParameterChanges(value !== original);
   }, []);
 
   const handleTemperatureChange = useCallback((value: number) => {
     setTemperature(value);
-    storage.set('lumora-temperature', value.toString());
-    
-    if (tempTimeoutRef.current) clearTimeout(tempTimeoutRef.current);
-    tempTimeoutRef.current = setTimeout(() => {
-      toast.success(`Temperature set to ${value}`);
-    }, 500);
+    const original = parseFloat(storage.get('lumora-temperature') || '0.5');
+    setHasParameterChanges(value !== original);
   }, []);
 
   const handleContextWindowChange = useCallback((value: number) => {
     setContextWindow(value);
-    storage.set('lumora-context-window', value.toString());
-    
-    if (contextTimeoutRef.current) clearTimeout(contextTimeoutRef.current);
-    contextTimeoutRef.current = setTimeout(() => {
-      toast.success(`Context window set to ${value} messages`);
-    }, 500);
+    const original = parseInt(storage.get('lumora-context-window') || '6');
+    setHasParameterChanges(value !== original);
   }, []);
+
+  const handleSaveParameters = useCallback(() => {
+    storage.set('lumora-max-tokens', maxTokens.toString());
+    storage.set('lumora-temperature', temperature.toString());
+    storage.set('lumora-context-window', contextWindow.toString());
+    setHasParameterChanges(false);
+    toast.success('AI parameters saved!');
+  }, [maxTokens, temperature, contextWindow]);
 
   const handleCustomInstructionsChange = useCallback((value: string) => {
     setCustomInstructions(value);
@@ -369,6 +366,18 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
                 />
                 <p className="text-xs text-zinc-500 mt-1">Number of previous messages AI remembers</p>
               </div>
+              
+              {hasParameterChanges && (
+                <button
+                  onClick={handleSaveParameters}
+                  className="bg-white hover:bg-zinc-100 text-black px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Save Parameters
+                </button>
+              )}
             </div>
           </div>
 
@@ -379,46 +388,44 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
               <h3 className="text-lg font-semibold text-white">UI Preferences</h3>
             </div>
             
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-3">
                 <div>
                   <p className="text-sm font-medium text-white">Markdown Formatting</p>
                   <p className="text-xs text-zinc-500">Enable rich text formatting in responses</p>
                 </div>
                 <button
                   onClick={toggleMarkdown}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableMarkdown ? 'bg-teal-500' : 'bg-zinc-700'}`}
+                  className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableMarkdown ? 'bg-teal-500' : 'bg-zinc-600'}`}
                 >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enableMarkdown ? 'translate-x-6' : 'translate-x-1'}`} />
+                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${enableMarkdown ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-3">
                 <div>
                   <p className="text-sm font-medium text-white">Animations</p>
                   <p className="text-xs text-zinc-500">Enable smooth transitions and effects</p>
                 </div>
                 <button
                   onClick={toggleAnimations}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableAnimations ? 'bg-teal-500' : 'bg-zinc-700'}`}
+                  className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableAnimations ? 'bg-teal-500' : 'bg-zinc-600'}`}
                 >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enableAnimations ? 'translate-x-6' : 'translate-x-1'}`} />
+                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${enableAnimations ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-3">
                 <div>
                   <p className="text-sm font-medium text-white">AI Reasoning Chain</p>
                   <p className="text-xs text-zinc-500">Show AI's step-by-step thinking (uses ~150 extra tokens)</p>
                 </div>
                 <button
                   onClick={toggleReasoning}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableReasoning ? 'bg-teal-500' : 'bg-zinc-700'}`}
+                  className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableReasoning ? 'bg-teal-500' : 'bg-zinc-600'}`}
                 >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enableReasoning ? 'translate-x-6' : 'translate-x-1'}`} />
+                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${enableReasoning ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
-            </div>
           </div>
 
           {/* Encryption Test Section */}

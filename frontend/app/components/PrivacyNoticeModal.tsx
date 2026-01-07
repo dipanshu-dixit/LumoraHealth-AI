@@ -13,12 +13,17 @@ export default function PrivacyNoticeModal({ onComplete }: PrivacyNoticeModalPro
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
     >
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2 }}
+        initial={{ scale: 0.8, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: -10 }}
+        transition={{ 
+          duration: 0.4,
+          ease: [0.25, 0.46, 0.45, 0.94]
+        }}
         className="max-w-lg mx-4 bg-zinc-900 border border-white/30 rounded-2xl p-8 shadow-2xl"
         role="dialog"
         aria-labelledby="privacy-title"
@@ -60,6 +65,9 @@ export default function PrivacyNoticeModal({ onComplete }: PrivacyNoticeModalPro
           className="w-full bg-white hover:bg-zinc-100 text-black py-3 rounded-lg font-medium transition-colors"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.3 }}
         >
           I Understand
         </motion.button>

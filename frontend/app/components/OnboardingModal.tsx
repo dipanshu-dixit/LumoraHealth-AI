@@ -39,10 +39,10 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
 
 	useEffect(() => {
 		if (step === 1) {
-			const timer = setTimeout(() => setStep(2), 3000);
+			const timer = setTimeout(() => setStep(2), 4000); // Increased from 3000
 			return () => clearTimeout(timer);
 		} else if (step === 2) {
-			const timer = setTimeout(() => setStep(3), 2500);
+			const timer = setTimeout(() => setStep(3), 5000); // Increased from 2500 for longer text
 			return () => clearTimeout(timer);
 		}
 		return undefined;

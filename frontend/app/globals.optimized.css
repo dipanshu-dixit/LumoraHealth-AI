@@ -158,6 +158,51 @@ img {
   max-width: 100%;
 }
 
+/* Large Text Accessibility */
+.large-text {
+  --text-scale: 1.25;
+}
+
+.large-text body,
+.large-text .prose,
+.large-text p,
+.large-text span,
+.large-text div,
+.large-text button,
+.large-text input,
+.large-text textarea,
+.large-text label {
+  font-size: calc(1rem * var(--text-scale)) !important;
+}
+
+.large-text .text-xs {
+  font-size: calc(0.75rem * var(--text-scale)) !important;
+}
+
+.large-text .text-sm {
+  font-size: calc(0.875rem * var(--text-scale)) !important;
+}
+
+.large-text .text-base {
+  font-size: calc(1rem * var(--text-scale)) !important;
+}
+
+.large-text .text-lg {
+  font-size: calc(1.125rem * var(--text-scale)) !important;
+}
+
+.large-text .text-xl {
+  font-size: calc(1.25rem * var(--text-scale)) !important;
+}
+
+.large-text .text-2xl {
+  font-size: calc(1.5rem * var(--text-scale)) !important;
+}
+
+.large-text .text-3xl {
+  font-size: calc(1.875rem * var(--text-scale)) !important;
+}
+
 /* Optimize for mobile viewport */
 @media (max-width: 768px) {
   /* Reduce font sizes slightly for mobile */

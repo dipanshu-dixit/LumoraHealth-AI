@@ -352,7 +352,7 @@ export default function Dashboard() {
             },
           }}
         />
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 pb-20 lg:pb-8">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 pb-20 lg:pb-8 mt-16">
           <div className="mb-6 flex items-center justify-between">
             <div>
               <h1 className="text-2xl md:text-3xl font-light text-white mb-2 flex items-center gap-3">
@@ -705,11 +705,13 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl p-6"
+              className="bg-zinc-900/80 backdrop-blur-sm border border-zinc-700/50 rounded-xl p-6 shadow-lg"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <MessageCircle className="w-5 h-5 text-blue-400" />
-                <h2 className="text-lg font-medium text-[var(--text-primary)]">Health Notes</h2>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-blue-500/20 rounded-lg">
+                  <MessageCircle className="w-5 h-5 text-blue-400" />
+                </div>
+                <h2 className="text-lg font-semibold text-white">Health Notes</h2>
               </div>
               
               <div className="space-y-3">
@@ -720,26 +722,26 @@ export default function Dashboard() {
                     onChange={(e) => setQuickNote(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && addQuickNote()}
                     placeholder="Add a health observation..."
-                    className="flex-1 bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-2 text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:border-white"
+                    className="flex-1 bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:border-teal-500 transition-colors"
                   />
                   <button
                     onClick={addQuickNote}
-                    className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center min-w-[48px]"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
                 
-                <div className="space-y-2 max-h-32 overflow-y-auto">
+                <div className="space-y-3 max-h-40 overflow-y-auto">
                   {healthNotes.map((note) => (
-                    <div key={note.id} className="flex items-start justify-between bg-zinc-800/30 p-3 rounded-lg border border-zinc-700/50">
+                    <div key={note.id} className="flex items-start justify-between bg-zinc-800/40 border border-zinc-700/30 p-4 rounded-lg hover:bg-zinc-800/60 transition-colors">
                       <div className="flex-1 min-w-0">
-                        <p className="text-[var(--text-primary)] text-sm">{note.text}</p>
-                        <p className="text-[var(--text-secondary)] text-xs mt-1">{note.date}</p>
+                        <p className="text-white text-sm leading-relaxed">{note.text}</p>
+                        <p className="text-zinc-400 text-xs mt-2">{note.date}</p>
                       </div>
                       <button
                         onClick={() => deleteNote(note.id)}
-                        className="text-red-400 hover:text-red-300 text-sm w-5 h-5 flex items-center justify-center ml-2 flex-shrink-0"
+                        className="text-zinc-400 hover:text-red-400 text-lg w-6 h-6 flex items-center justify-center ml-3 flex-shrink-0 transition-colors"
                       >
                         ×
                       </button>
@@ -754,11 +756,13 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-zinc-900 border border-green-500/30 rounded-xl p-6"
+              className="bg-zinc-900/80 backdrop-blur-sm border border-zinc-700/50 rounded-xl p-6 shadow-lg"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <Target className="w-5 h-5 text-green-400" />
-                <h2 className="text-lg font-medium text-[var(--text-primary)]">Health Objectives</h2>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <Target className="w-5 h-5 text-green-400" />
+                </div>
+                <h2 className="text-lg font-semibold text-white">Health Objectives</h2>
               </div>
               
               <div className="space-y-3">
@@ -769,23 +773,23 @@ export default function Dashboard() {
                     onChange={(e) => setNewGoal(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && addHealthGoal()}
                     placeholder="Set a health objective..."
-                    className="flex-1 bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-2 text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:border-white"
+                    className="flex-1 bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:border-teal-500 transition-colors"
                   />
                   <button
                     onClick={addHealthGoal}
-                    className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg transition-colors"
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center min-w-[48px]"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
                 
-                <div className="space-y-2 max-h-32 overflow-y-auto">
+                <div className="space-y-3 max-h-40 overflow-y-auto">
                   {healthGoals.map((goal, index) => (
-                    <div key={index} className="flex items-center justify-between bg-zinc-800/30 p-3 rounded-lg border border-zinc-700/50">
-                      <span className="text-[var(--text-primary)] text-sm">{goal}</span>
+                    <div key={index} className="flex items-center justify-between bg-zinc-800/40 border border-zinc-700/30 p-4 rounded-lg hover:bg-zinc-800/60 transition-colors">
+                      <span className="text-white text-sm leading-relaxed">{goal}</span>
                       <button
                         onClick={() => removeGoal(index)}
-                        className="text-red-400 hover:text-red-300 text-sm w-5 h-5 flex items-center justify-center"
+                        className="text-zinc-400 hover:text-red-400 text-lg w-6 h-6 flex items-center justify-center transition-colors"
                       >
                         ×
                       </button>
