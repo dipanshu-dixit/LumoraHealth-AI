@@ -6,8 +6,11 @@ import { HardDrive, AlertTriangle } from 'lucide-react';
 
 export default function StorageUsageCard() {
   const [storageInfo, setStorageInfo] = useState<ReturnType<typeof getStorageInfo> | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+    
     const updateStorage = () => {
       setStorageInfo(getStorageInfo());
     };
@@ -18,7 +21,8 @@ export default function StorageUsageCard() {
     return () => clearInterval(interval);
   }, []);
 
-  if (!storageInfo) return null;
+  // Don't render until mounted to prevent SSR issues
+  if (!isMounted || !storageInfo) return null;
 
   const getStatusColor = () => {
     if (storageInfo.isCritical) return 'text-red-500';

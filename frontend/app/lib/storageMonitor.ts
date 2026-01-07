@@ -10,12 +10,34 @@ const WARNING_THRESHOLD_MB = 5;
 const CRITICAL_THRESHOLD_MB = 8;
 
 export function getStorageInfo(): StorageInfo {
+  // Check if we're in a browser environment
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    return {
+      used: 0,
+      usedMB: 0,
+      percentage: 0,
+      isWarning: false,
+      isCritical: false
+    };
+  }
+  
   let totalSize = 0;
   
-  for (const key in localStorage) {
-    if (localStorage.hasOwnProperty(key)) {
-      totalSize += localStorage[key].length + key.length;
+  try {
+    for (const key in localStorage) {
+      if (localStorage.hasOwnProperty(key)) {
+        totalSize += localStorage[key].length + key.length;
+      }
     }
+  } catch (error) {
+    // Handle localStorage access errors
+    return {
+      used: 0,
+      usedMB: 0,
+      percentage: 0,
+      isWarning: false,
+      isCritical: false
+    };
   }
   
   // Convert to bytes (each character is 2 bytes in UTF-16)

@@ -55,93 +55,24 @@ export default function Settings() {
 	}, []);
 
 	const handleExportData = useCallback(async () => {
-		toast.loading('Preparing your data export...', { id: 'export' });
+		toast.loading('Preparing export...', { id: 'export' });
     
 		const userData = {
-			user: {
-				name: fullName,
-				firstName,
-				lastName,
-				exportDate: new Date().toISOString()
-			},
+			user: { name: fullName, firstName, lastName, exportDate: new Date().toISOString() },
 			chatHistory: typeof window !== 'undefined' ? JSON.parse(storage.get(STORAGE_KEYS.CHAT_HISTORY) || '[]') : []
 		};
 
-		const htmlContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Lumora Health Data Export - ${fullName}</title>
-	<style>
-		body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
-		.header { background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); color: white; padding: 40px; border-radius: 12px; margin-bottom: 30px; }
-		.header h1 { margin: 0 0 10px 0; font-size: 42px; font-family: Georgia, serif; font-style: italic; font-weight: 300; }
-		.header p { margin: 5px 0; opacity: 0.9; }
-		.section { background: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-		.section h2 { color: #14b8a6; margin-top: 0; border-bottom: 2px solid #14b8a6; padding-bottom: 10px; }
-		.chat { background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #14b8a6; }
-		.chat-title { font-weight: bold; color: #1f2937; margin-bottom: 10px; font-size: 18px; }
-		.chat-date { color: #6b7280; font-size: 14px; margin-bottom: 15px; }
-		.message { margin: 15px 0; padding: 12px; border-radius: 8px; }
-		.user-msg { background: #e0f2fe; margin-left: 40px; }
-		.ai-msg { background: #f0fdfa; margin-right: 40px; border-left: 3px solid #14b8a6; }
-		.label { font-weight: 600; color: #14b8a6; font-size: 12px; text-transform: uppercase; margin-bottom: 5px; }
-		.footer { text-align: center; color: #6b7280; margin-top: 40px; padding: 20px; font-size: 14px; }
-		@media print { body { background: white; } .section { box-shadow: none; page-break-inside: avoid; } }
-	</style>
-</head>
-<body>
-	<div class="header">
-		<h1>Lumora</h1>
-		<p><strong>${escapeHtml(fullName)}</strong></p>
-		<p>Health Data Export</p>
-		<p>Generated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-	</div>
-
-	<div class="section">
-		<h2>📊 Summary</h2>
-		<p><strong>Total Conversations:</strong> ${userData.chatHistory.length}</p>
-		<p><strong>Export Date:</strong> ${new Date().toLocaleDateString()}</p>
-	</div>
-
-	<div class="section">
-		<h2>💬 Conversation History</h2>
-		${userData.chatHistory.map((chat: any, i: number) => `
-			<div class="chat">
-				<div class="chat-title">${i + 1}. ${escapeHtml(chat.topic || 'Health Consultation')}</div>
-				<div class="chat-date">${new Date(chat.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
-				${chat.messages.map((msg: any) => `
-					<div class="message ${msg.isUser ? 'user-msg' : 'ai-msg'}">
-						<div class="label">${msg.isUser ? 'You' : 'Lumora AI'}</div>
-						<div>${msg.content.replace(/\*\*/g, '').replace(/\*/g, '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</div>
-					</div>
-				`).join('')}
-			</div>
-		`).join('')}
-	</div>
-
-	<div class="footer">
-		<p><strong>Lumora AI v1.1</strong> • Privacy-First Health Intelligence</p>
-		<p>This data is exported from your local device storage. No data was sent to external servers.</p>
-		<p style="margin-top: 20px; font-size: 12px; color: #9ca3af;">To save as PDF: Press Ctrl+P (Cmd+P on Mac) → Select "Save as PDF"</p>
-	</div>
-</body>
-</html>
-		`;
+		const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Lumora Export - ${fullName}</title><style>body{font-family:system-ui;max-width:900px;margin:40px auto;padding:20px;background:#f5f5f5}.header{background:linear-gradient(135deg,#14b8a6,#0d9488);color:white;padding:40px;border-radius:12px;margin-bottom:30px}.section{background:white;padding:30px;border-radius:12px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}.chat{background:#f9fafb;padding:20px;border-radius:8px;margin-bottom:20px;border-left:4px solid #14b8a6}.message{margin:15px 0;padding:12px;border-radius:8px}.user-msg{background:#e0f2fe;margin-left:40px}.ai-msg{background:#f0fdfa;margin-right:40px}</style></head><body><div class="header"><h1>Lumora</h1><p>${escapeHtml(fullName)}</p><p>Generated: ${new Date().toLocaleDateString()}</p></div><div class="section"><h2>Summary</h2><p>Total: ${userData.chatHistory.length} conversations</p></div><div class="section"><h2>Conversations</h2>${userData.chatHistory.map((chat: any, i: number) => `<div class="chat"><div>${i + 1}. ${escapeHtml(chat.topic || 'Health Consultation')}</div><div>${new Date(chat.timestamp).toLocaleDateString()}</div>${chat.messages.map((msg: any) => `<div class="message ${msg.isUser ? 'user-msg' : 'ai-msg'}"><strong>${msg.isUser ? 'You' : 'AI'}:</strong> ${msg.content.replace(/[<>]/g, '').replace(/\n/g, '<br>')}</div>`).join('')}</div>`).join('')}</div></body></html>`;
 
 		const blob = new Blob([htmlContent], { type: 'text/html' });
 		const url = URL.createObjectURL(blob);
 		const link = document.createElement('a');
 		link.href = url;
-		link.download = `Lumora-Health-Data-${new Date().toISOString().split('T')[0]}.html`;
-		document.body.appendChild(link);
+		link.download = `Lumora-${new Date().toISOString().split('T')[0]}.html`;
 		link.click();
-		document.body.removeChild(link);
 		URL.revokeObjectURL(url);
     
-		toast.success('Data exported! Open the HTML file and print to save as PDF.', { id: 'export', duration: 5000 });
+		toast.success('Data exported!', { id: 'export', duration: 3000 });
 	}, [fullName, firstName, lastName, escapeHtml]);
 
 	const handleDeleteAccount = useCallback(() => {
@@ -207,9 +138,9 @@ export default function Settings() {
 										</label>
 										<input
 											type="text"
-											value={tempFirstName}
+											value={mounted ? tempFirstName : ''}
 											onChange={(e) => handleFirstNameChange(e.target.value)}
-											className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all font-sans"
+											className="w-full h-12 bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-white focus:border-white transition-colors font-sans"
 											placeholder="Enter your first name"
 										/>
 									</div>
@@ -219,49 +150,52 @@ export default function Settings() {
 										</label>
 										<input
 											type="text"
-											value={tempLastName}
+											value={mounted ? tempLastName : ''}
 											onChange={(e) => handleLastNameChange(e.target.value)}
-											className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all font-sans"
+											className="w-full h-12 bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-white focus:border-white transition-colors font-sans"
 											placeholder="Enter your last name"
 										/>
 									</div>
 									
-									{hasChanges && (
-										<button
-											onClick={handleSaveName}
-											className="bg-white hover:bg-zinc-100 text-black px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 font-sans"
-										>
-											<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-											</svg>
-											Save Name
-										</button>
-									)}
+									{/* Reserve space for save button to prevent layout shift */}
+									<div className="h-12">
+										{hasChanges && (
+											<button
+												onClick={handleSaveName}
+												className="bg-white hover:bg-zinc-100 text-black px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 font-sans h-12"
+											>
+												<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+												</svg>
+												Save
+											</button>
+										)}
+									</div>
 								</div>
 								
-								<div className="flex flex-col gap-3">
+								<div className="flex flex-col gap-3 min-h-[180px]">
 									<button
 										onClick={handleExportData}
-										className="bg-white hover:bg-zinc-100 text-black px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-3 font-sans"
+										className="bg-white hover:bg-zinc-100 text-black px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-3 font-sans h-12"
 									>
 										<Download className="w-5 h-5" />
-										Export Data
+										Export
 									</button>
 									
 									<button
 										onClick={handleFactoryReset}
-										className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-3 font-sans"
+										className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-3 font-sans h-12"
 									>
 										<SettingsIcon className="w-5 h-5" />
-										Factory Reset
+										Reset
 									</button>
 									
 									<button
 										onClick={() => setShowDeleteModal(true)}
-										className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-3 font-sans"
+										className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-3 font-sans h-12"
 									>
 										<Trash2 className="w-5 h-5" />
-										<span className="text-red-100">Delete Account</span>
+										Delete
 									</button>
 								</div>
 							</div>
@@ -278,18 +212,23 @@ export default function Settings() {
 									<Bell className="w-5 h-5 text-white" />
 									<label className="text-white font-medium font-sans">Daily Check-ins</label>
 								</div>
-								<button
-									onClick={toggleNotifications}
-									className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black ${
-										notificationsMounted && notificationsEnabled ? 'bg-teal-500' : 'bg-zinc-700'
-									}`}
-								>
-									<span
-										className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-											notificationsMounted && notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
-										}`}
-									/>
-								</button>
+								{/* Reserve space for toggle to prevent layout shift */}
+								<div className="h-6">
+									{mounted && (
+										<button
+											onClick={toggleNotifications}
+											className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black ${
+												notificationsMounted && notificationsEnabled ? 'bg-teal-500' : 'bg-zinc-700'
+											}`}
+										>
+											<span
+												className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+													notificationsMounted && notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
+												}`}
+											/>
+										</button>
+									)}
+								</div>
 							</div>
 						</div>
 

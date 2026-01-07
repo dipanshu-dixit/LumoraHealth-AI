@@ -145,13 +145,13 @@ class ErrorBoundary extends Component<Props, State> {
 								</button>
 							)}
 
-							<button
-								onClick={this.handleReportBug}
-								className="w-full py-3 px-4 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+							<a
+								href="mailto:dipanshudixit206@gmail.com?subject=Lumora Error Report&body=Hi Dipanshu,%0D%0A%0D%0AI encountered an error in Lumora:%0D%0A%0D%0AError: {error?.message || 'Unknown error'}%0D%0A%0D%0APlease help me resolve this issue."
+								className="w-full py-3 px-4 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors block text-center"
 								style={{ color: '#666' }}
 							>
-								Report Bug
-							</button>
+								Contact Support
+							</a>
 
 							<button
 								onClick={() => window.location.reload()}

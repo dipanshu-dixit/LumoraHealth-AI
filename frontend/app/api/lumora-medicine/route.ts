@@ -81,8 +81,6 @@ export async function POST(req: Request) {
         model: "grok-4-1-fast-reasoning",
         max_tokens: 400,
         temperature: 0.3,
-        presence_penalty: 0.5,
-        frequency_penalty: 0.5,
         messages: [
           {
             role: "system",
