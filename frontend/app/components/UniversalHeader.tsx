@@ -82,24 +82,18 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({
       suppressHydrationWarning={true}
       className="fixed top-0 left-0 right-0 h-16 bg-black/80 backdrop-blur-md border-b border-white/5 z-40 flex items-center justify-between px-4 lg:left-[var(--sidebar-width,64px)]"
     >
-      <div className="flex items-center gap-3">
-        <motion.button
-          onClick={() => window.dispatchEvent(new CustomEvent('toggle-drawer'))}
-          className="lg:hidden bg-zinc-900/90 border border-zinc-800 rounded-full p-2 text-zinc-400 hover:text-white transition-colors"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </motion.button>
-        
-        <h1 className="text-lg font-medium bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-          {pathname === '/' ? (sidebarExpanded ? '' : 'Lumora') : getGradientTitle(getPageTitle())}
-        </h1>
-      </div>
+      <motion.button
+        onClick={() => window.dispatchEvent(new CustomEvent('toggle-drawer'))}
+        className="lg:hidden bg-zinc-900/90 border border-zinc-800 rounded-full p-2 text-zinc-400 hover:text-white transition-colors"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </motion.button>
 
       {mounted && (
         <div className="lg:hidden flex items-center gap-2 bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-full px-3 py-1.5">

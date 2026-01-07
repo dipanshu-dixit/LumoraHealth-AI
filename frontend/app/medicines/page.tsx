@@ -264,30 +264,30 @@ function MedicinesContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                className="max-w-4xl mx-auto"
+                className="w-full max-w-4xl mx-auto px-2 sm:px-0"
               >
                 {/* Header Card */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6">
                   <div className="flex items-start justify-between">
-                    <div>
-                  <div className="text-3xl font-light text-white mb-2">
-                    <ReactMarkdown components={{ p: 'span' }}>{searchQuery}</ReactMarkdown>
-                  </div>
-                      <p className="text-zinc-400 text-sm">Comprehensive medication information</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xl sm:text-3xl font-light text-white mb-2 break-words">
+                        <ReactMarkdown components={{ p: 'span' }}>{searchQuery}</ReactMarkdown>
+                      </div>
+                      <p className="text-zinc-400 text-xs sm:text-sm">Comprehensive medication information</p>
                     </div>
-                    <div className="flex gap-2">
-                      <div className="p-3 bg-white/5 rounded-xl">
-                        <Shield className="w-6 h-6 text-zinc-400" />
+                    <div className="flex gap-2 ml-4">
+                      <div className="p-2 sm:p-3 bg-white/5 rounded-xl">
+                        <Shield className="w-4 h-4 sm:w-6 sm:h-6 text-zinc-400" />
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Info Card */}
-                <div className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-2xl p-8 shadow-2xl">
-                  <div className="prose prose-invert max-w-none 
+                <div className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-2xl p-4 sm:p-8 shadow-2xl">
+                  <div className="prose prose-invert max-w-none text-sm sm:text-base
                     prose-headings:text-white prose-headings:font-light prose-headings:tracking-tight
-                    prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg
+                    prose-h1:text-lg sm:prose-h1:text-2xl prose-h2:text-base sm:prose-h2:text-xl prose-h3:text-sm sm:prose-h3:text-lg
                     prose-p:text-zinc-300 prose-p:leading-relaxed
                     prose-strong:text-white prose-strong:font-medium
                     prose-li:text-zinc-300 prose-li:marker:text-zinc-400
@@ -298,11 +298,11 @@ function MedicinesContent() {
                   </div>
 
                   {/* Footer Warning */}
-                  <div className="mt-8 pt-6 border-t border-zinc-800">
-                    <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                      <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-zinc-800">
+                    <div className="flex items-start gap-3 p-3 sm:p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                      <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-sm text-amber-200 font-medium mb-1">Medical Disclaimer</p>
+                        <p className="text-xs sm:text-sm text-amber-200 font-medium mb-1">Medical Disclaimer</p>
                         <p className="text-xs text-amber-300/80 leading-relaxed">
                           This information is for educational purposes only. Always consult a qualified healthcare professional before starting, stopping, or changing any medication.
                         </p>

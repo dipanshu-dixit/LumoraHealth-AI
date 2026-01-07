@@ -9,7 +9,7 @@ export default function Documentation() {
       <NavigationSidebar user={{ name: typeof window !== 'undefined' ? localStorage.getItem('lumora-user-name') || 'User' : 'User' }} />
       
       <div className="flex-1 overflow-y-auto bg-[var(--bg-page)]">
-        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 pt-8">
+        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 pt-8 pb-40">
           <div className="text-center mb-6">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Book className="w-10 h-10 text-blue-400" />

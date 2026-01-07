@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Shield, Lock, CheckCircle, XCircle, AlertTriangle, Zap, Database, Code, Settings, Bell } from 'lucide-react';
 import { secureStorage } from '@/lib/secureStorage';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
@@ -25,6 +25,12 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
   const [enableReasoning, setEnableReasoning] = useState(false);
   const [autoDeleteDays, setAutoDeleteDays] = useState(30);
   const [messageLimit, setMessageLimit] = useState(50);
+  
+  // Debounce refs for notifications
+  const tokenTimeoutRef = useRef<NodeJS.Timeout>();
+  const tempTimeoutRef = useRef<NodeJS.Timeout>();
+  const contextTimeoutRef = useRef<NodeJS.Timeout>();
+  const instructionsTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     if (isOpen) {
@@ -38,6 +44,16 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
       setMessageLimit(parseInt(storage.get('lumora-message-limit') || '50'));
     }
   }, [isOpen]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (tokenTimeoutRef.current) clearTimeout(tokenTimeoutRef.current);
+      if (tempTimeoutRef.current) clearTimeout(tempTimeoutRef.current);
+      if (contextTimeoutRef.current) clearTimeout(contextTimeoutRef.current);
+      if (instructionsTimeoutRef.current) clearTimeout(instructionsTimeoutRef.current);
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -63,23 +79,44 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
     }
   };
 
-  const handleMaxTokensChange = (value: number) => {
+  const handleMaxTokensChange = useCallback((value: number) => {
     setMaxTokens(value);
     storage.set('lumora-max-tokens', value.toString());
-    toast.success(`Max tokens set to ${value}`);
-  };
+    
+    if (tokenTimeoutRef.current) clearTimeout(tokenTimeoutRef.current);
+    tokenTimeoutRef.current = setTimeout(() => {
+      toast.success(`Max tokens set to ${value}`);
+    }, 500);
+  }, []);
 
-  const handleTemperatureChange = (value: number) => {
+  const handleTemperatureChange = useCallback((value: number) => {
     setTemperature(value);
     storage.set('lumora-temperature', value.toString());
-    toast.success(`Temperature set to ${value}`);
-  };
+    
+    if (tempTimeoutRef.current) clearTimeout(tempTimeoutRef.current);
+    tempTimeoutRef.current = setTimeout(() => {
+      toast.success(`Temperature set to ${value}`);
+    }, 500);
+  }, []);
 
-  const handleContextWindowChange = (value: number) => {
+  const handleContextWindowChange = useCallback((value: number) => {
     setContextWindow(value);
     storage.set('lumora-context-window', value.toString());
-    toast.success(`Context window set to ${value} messages`);
-  };
+    
+    if (contextTimeoutRef.current) clearTimeout(contextTimeoutRef.current);
+    contextTimeoutRef.current = setTimeout(() => {
+      toast.success(`Context window set to ${value} messages`);
+    }, 500);
+  }, []);
+
+  const handleCustomInstructionsChange = useCallback((value: string) => {
+    storage.set('lumora-custom-instructions', value);
+    
+    if (instructionsTimeoutRef.current) clearTimeout(instructionsTimeoutRef.current);
+    instructionsTimeoutRef.current = setTimeout(() => {
+      toast.success('Custom instructions updated!');
+    }, 1000);
+  }, []);
 
   const toggleMarkdown = () => {
     const newValue = !enableMarkdown;
@@ -256,10 +293,7 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
                 </div>
                 <textarea
                   defaultValue={storage.get('lumora-custom-instructions') || ''}
-                  onChange={(e) => {
-                    storage.set('lumora-custom-instructions', e.target.value);
-                    toast.success('Custom instructions updated!', { duration: 2000 });
-                  }}
+                  onChange={(e) => handleCustomInstructionsChange(e.target.value)}
                   placeholder="e.g., I have diabetes, I'm sensitive to light, I prefer natural remedies, I'm a healthcare worker..."
                   rows={4}
                   className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all resize-none"
@@ -336,7 +370,7 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
                 </div>
                 <button
                   onClick={toggleMarkdown}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${enableMarkdown ? 'bg-teal-500' : 'bg-zinc-700'}`}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableMarkdown ? 'bg-teal-500' : 'bg-zinc-700'}`}
                 >
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enableMarkdown ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>
@@ -349,7 +383,7 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
                 </div>
                 <button
                   onClick={toggleAnimations}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${enableAnimations ? 'bg-teal-500' : 'bg-zinc-700'}`}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableAnimations ? 'bg-teal-500' : 'bg-zinc-700'}`}
                 >
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enableAnimations ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>
@@ -362,7 +396,7 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
                 </div>
                 <button
                   onClick={toggleReasoning}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${enableReasoning ? 'bg-teal-500' : 'bg-zinc-700'}`}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableReasoning ? 'bg-teal-500' : 'bg-zinc-700'}`}
                 >
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enableReasoning ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>

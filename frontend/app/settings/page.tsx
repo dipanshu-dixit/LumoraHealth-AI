@@ -190,7 +190,7 @@ export default function Settings() {
 					}}
 				/>
       
-			<div className="max-w-6xl mx-auto px-6 py-6 pt-8">
+			<div className="max-w-6xl mx-auto px-6 py-6 pt-8 pb-40">
 					<h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-8 font-sans">
 						Settings
 					</h1>

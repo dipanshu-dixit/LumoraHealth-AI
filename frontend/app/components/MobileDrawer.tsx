@@ -76,7 +76,7 @@ const MobileDrawer = React.memo(() => {
             }`}
           >
             <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
-              <span className="text-2xl font-bold text-white" style={{ fontFamily: '"Brush Script MT", "Apple Chancery", "Lucida Handwriting", cursive' }}>Lumora</span>
+              <span className="text-5xl font-bold text-white tracking-wide drop-shadow-lg" style={{ fontFamily: '"Brush Script MT", "Apple Chancery", "Lucida Handwriting", cursive' }}>Lumora</span>
               <button onClick={() => setIsOpen(false)} className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                 <X size={20} />
               </button>

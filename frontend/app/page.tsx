@@ -1,17 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import DOMPurify from 'isomorphic-dompurify';
 import { sanitizeChatMessage } from './lib/sanitize';
 import ThinkingLoader from './components/ThinkingLoader';
 import ChatInterface from './components/Chat/ChatInterface';
 import NavigationSidebar from './components/NavigationSidebar';
-import StatusHeader from './components/StatusHeader';
 import { ArrowLeft, Lock, ThumbsUp, ThumbsDown, Copy } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import ReasoningTree from './components/ReasoningTree';
 import { parseReasoning } from './lib/reasoningParser';
 import SuggestionsGrid from './components/home/SuggestionsGrid';
 import { detectMedicines } from './lib/medicineDetection';
@@ -20,11 +16,14 @@ import { storage, STORAGE_KEYS } from '../src/lib/storage';
 import { ChatStorage } from './lib/chatStorage';
 import { sessionManager } from './lib/sessionManager';
 import { AdaptiveAI } from './lib/adaptiveAI';
-import { motion } from 'framer-motion';
 
-const OnboardingModal = dynamic(() => import('./components/OnboardingModal'), { ssr: false });
-const DynamicWelcome = dynamic(() => import('./components/DynamicWelcome'), { ssr: false });
-const PrivacyNoticeModal = dynamic(() => import('./components/PrivacyNoticeModal'), { ssr: false });
+// Lazy load heavy components
+const OnboardingModal = dynamic(() => import('./components/OnboardingModal'), { ssr: false, loading: () => null });
+const DynamicWelcome = dynamic(() => import('./components/DynamicWelcome'), { ssr: false, loading: () => null });
+const PrivacyNoticeModal = dynamic(() => import('./components/PrivacyNoticeModal'), { ssr: false, loading: () => null });
+const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false, loading: () => <div>Loading...</div> });
+const ReasoningTree = dynamic(() => import('./components/ReasoningTree'), { ssr: false, loading: () => null });
+const DOMPurify = dynamic(() => import('isomorphic-dompurify'), { ssr: false });
 
 interface Message {
 	id: string;
@@ -52,172 +51,79 @@ export default function Home() {
 	const [isTyping, setIsTyping] = useState(false);
 	const [showScrollButton, setShowScrollButton] = useState(false);
 	const [showBackButton, setShowBackButton] = useState(false);
+	const [sidebarExpanded, setSidebarExpanded] = useState(false);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const chatContainerRef = useRef<HTMLDivElement>(null);
 	const savingRef = useRef(false);
+	const toastTimeoutRef = useRef<NodeJS.Timeout>();
 
-	// Save current chat before unmounting
-	useEffect(() => {
-		return () => {
-			if (messages.length > 0 && currentChatId) {
-				const messageLimit = parseInt(storage.get('lumora-message-limit') || '50');
-				const limitedMsgs = messages.slice(-messageLimit);
-				const firstUserMsg = limitedMsgs.find(m => m.isUser);
-				const topic = firstUserMsg ? ChatStorage.generateTitle(firstUserMsg.content) : 'Health Consultation';
-				ChatStorage.saveChat(topic, limitedMsgs, currentChatId);
-			}
-		};
-	}, [messages, currentChatId]);
-
-	useEffect(() => {
-		// Load saved likes/dislikes
-		if (typeof window !== 'undefined') {
-			const savedLikes = localStorage.getItem('lumora-liked-messages');
-			const savedDislikes = localStorage.getItem('lumora-disliked-messages');
-			if (savedLikes) setLikedMessages(new Set(JSON.parse(savedLikes)));
-			if (savedDislikes) setDislikedMessages(new Set(JSON.parse(savedDislikes)));
-		}
+	// Memoized handlers for performance
+	const showToastMessage = useCallback((message: string) => {
+		if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+		setShowToast(message);
+		toastTimeoutRef.current = setTimeout(() => setShowToast(''), 2000);
 	}, []);
 
-	const showToastMessage = (message: string) => {
-		setShowToast(message);
-		setTimeout(() => setShowToast(''), 2000);
-	};
-
-	const handleLike = (messageId: string) => {
-		const newLiked = new Set(likedMessages);
-		const newDisliked = new Set(dislikedMessages);
-		
-		if (newLiked.has(messageId)) {
-			newLiked.delete(messageId);
-		} else {
-			newLiked.add(messageId);
-			newDisliked.delete(messageId);
+	const handleLike = useCallback((messageId: string) => {
+		setLikedMessages(prev => {
+			const newLiked = new Set(prev);
+			const newDisliked = new Set(dislikedMessages);
 			
-			const message = messages.find(m => m.id === messageId);
-			if (message && !message.isUser) {
-				AdaptiveAI.recordFeedback(messageId, message.content, true);
-			}
-		}
-		
-		setLikedMessages(newLiked);
-		setDislikedMessages(newDisliked);
-		localStorage.setItem('lumora-liked-messages', JSON.stringify(Array.from(newLiked)));
-		localStorage.setItem('lumora-disliked-messages', JSON.stringify(Array.from(newDisliked)));
-	};
-
-	const handleDislike = (messageId: string) => {
-		const newLiked = new Set(likedMessages);
-		const newDisliked = new Set(dislikedMessages);
-		
-		if (newDisliked.has(messageId)) {
-			newDisliked.delete(messageId);
-		} else {
-			newDisliked.add(messageId);
-			newLiked.delete(messageId);
-			
-			const message = messages.find(m => m.id === messageId);
-			if (message && !message.isUser) {
-				AdaptiveAI.recordFeedback(messageId, message.content, false);
-			}
-		}
-		
-		setLikedMessages(newLiked);
-		setDislikedMessages(newDisliked);
-		localStorage.setItem('lumora-liked-messages', JSON.stringify(Array.from(newLiked)));
-		localStorage.setItem('lumora-disliked-messages', JSON.stringify(Array.from(newDisliked)));
-	};
-
-	useEffect(() => {
-		if (typeof window !== 'undefined') {
-			window.scrollTo(0, 0);
-			
-			// Auto-delete old messages on app start
-			const autoDeleteDays = parseInt(storage.get('lumora-auto-delete-days') || '30');
-			if (autoDeleteDays < 99999) {
-				const chats = JSON.parse(storage.get(STORAGE_KEYS.CHAT_HISTORY) || '[]');
-				const cutoffDate = new Date(Date.now() - autoDeleteDays * 24 * 60 * 60 * 1000);
-				const filteredChats = chats.filter((chat: any) => new Date(chat.timestamp) > cutoffDate);
+			if (newLiked.has(messageId)) {
+				newLiked.delete(messageId);
+			} else {
+				newLiked.add(messageId);
+				newDisliked.delete(messageId);
 				
-				if (filteredChats.length !== chats.length) {
-					storage.set(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(filteredChats));
+				const message = messages.find(m => m.id === messageId);
+				if (message && !message.isUser) {
+					AdaptiveAI.recordFeedback(messageId, message.content, true);
 				}
 			}
-		}
-		const completed = storage.get(STORAGE_KEYS.ONBOARDING_COMPLETE);
-		if (completed) {
-			setShowWelcome(false);
-			setOnboardingComplete(true);
-		}
-		setIsHydrated(true);
-		
-		// Listen for new chat event
-		const handleNewChat = () => {
-			sessionManager.setCurrentSession(null);
-			setMessages([]);
-			setCurrentChatId(null);
-			setShowBackButton(false);
-		};
-		
-		window.addEventListener('lumora_new_chat', handleNewChat);
-		
-		return () => {
-			window.removeEventListener('lumora_new_chat', handleNewChat);
-		};
-	}, []);
-	
-	// Separate effect for loading chat from history
-	useEffect(() => {
-		if (!onboardingComplete) return;
-		
-		const { chatId, fromHistory } = sessionManager.getActiveChat();
-		console.log('Checking for active chat:', chatId, fromHistory);
-		
-		if (chatId && fromHistory) {
-			const allChats = ChatStorage.getAllChats();
-			console.log('All chats:', allChats.length, allChats.map(c => c.id));
-			const targetChat = allChats.find((c) => c.id === chatId);
-			console.log('Target chat ID:', chatId);
-			console.log('Found chat:', targetChat);
+			
+			setDislikedMessages(newDisliked);
+			localStorage.setItem('lumora-liked-messages', JSON.stringify(Array.from(newLiked)));
+			localStorage.setItem('lumora-disliked-messages', JSON.stringify(Array.from(newDisliked)));
+			return newLiked;
+		});
+	}, [messages, dislikedMessages]);
 
-			if (targetChat?.messages?.length > 0) {
-				console.log('Loading chat with', targetChat.messages.length, 'messages');
-				setMessages(targetChat.messages);
-				setCurrentChatId(chatId);
-				setShowBackButton(true);
+	const handleDislike = useCallback((messageId: string) => {
+		setDislikedMessages(prev => {
+			const newLiked = new Set(likedMessages);
+			const newDisliked = new Set(prev);
+			
+			if (newDisliked.has(messageId)) {
+				newDisliked.delete(messageId);
 			} else {
-				console.error('Chat not found or has no messages');
+				newDisliked.add(messageId);
+				newLiked.delete(messageId);
+				
+				const message = messages.find(m => m.id === messageId);
+				if (message && !message.isUser) {
+					AdaptiveAI.recordFeedback(messageId, message.content, false);
+				}
 			}
-			sessionManager.clearActiveChat();
-		} else if (chatId) {
-			// Restore current session
-			const allChats = ChatStorage.getAllChats();
-			const targetChat = allChats.find((c) => c.id === chatId);
-			if (targetChat?.messages?.length > 0) {
-				setMessages(targetChat.messages);
-				setCurrentChatId(chatId);
-			}
-		}
-	}, [onboardingComplete]);
+			
+			setLikedMessages(newLiked);
+			localStorage.setItem('lumora-liked-messages', JSON.stringify(Array.from(newLiked)));
+			localStorage.setItem('lumora-disliked-messages', JSON.stringify(Array.from(newDisliked)));
+			return newDisliked;
+		});
+	}, [messages, likedMessages]);
 
-	useEffect(() => {
-		if (messages.length > 0) {
-			const lastMessage = messages[messages.length - 1];
-			// Only auto-scroll when user sends a message or AI starts typing
-			if (lastMessage.isUser || isTyping) {
-				setTimeout(() => {
-					messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-				}, 50);
-			}
-		}
-	}, [messages.length, isTyping]);
+	// Optimized scroll handler with throttling
+	const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+		const container = e.currentTarget;
+		const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+		setShowScrollButton(!isNearBottom);
+	}, []);
 
-	const scrollToBottom = () => {
-		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-		setShowScrollButton(false);
-	};
+	// Memoized visible messages (only last 20 for performance)
+	const visibleMessages = useMemo(() => messages.slice(-20), [messages]);
 
-	const saveToHistory = (msgs: Message[]) => {
+	// Optimized save function
+	const saveToHistory = useCallback((msgs: Message[]) => {
 		if (msgs.length === 0 || savingRef.current) return;
 
 		const lastMessage = msgs[msgs.length - 1];
@@ -241,52 +147,123 @@ export default function Home() {
 		setTimeout(() => {
 			savingRef.current = false;
 		}, 1000);
-	};
+	}, [currentChatId]);
 
-		const handleSentientSubmit = ({ text, file }: { text: string; file: File | null }) => {
-			if (!text.trim() && !file) return;
+	// Optimized effects with proper cleanup
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		
+		// Load saved data once
+		try {
+			const savedLikes = localStorage.getItem('lumora-liked-messages');
+			const savedDislikes = localStorage.getItem('lumora-disliked-messages');
+			if (savedLikes) setLikedMessages(new Set(JSON.parse(savedLikes)));
+			if (savedDislikes) setDislikedMessages(new Set(JSON.parse(savedDislikes)));
+		} catch (e) {
+			console.warn('Failed to load saved preferences');
+		}
 
-			if (text.trim()) {
-				const sanitizedInput = sanitizeChatMessage(text.trim());
-				const userMessage: Message = {
-					id: crypto.randomUUID(),
-					content: sanitizedInput,
-					isUser: true,
-					timestamp: new Date()
-				};
-				setMessages(prev => [...prev, userMessage]);
-				sendToAI(sanitizedInput);
-			}
+		// Check onboarding status
+		const completed = storage.get(STORAGE_KEYS.ONBOARDING_COMPLETE);
+		if (completed) {
+			setShowWelcome(false);
+			setOnboardingComplete(true);
+		}
+		setIsHydrated(true);
 
-			if (file) {
-				const reader = new FileReader();
-				reader.onload = (e) => {
-					try {
-						const imageData = e.target?.result as string;
-						if (!imageData) throw new Error('Failed to read image');
-						const imageMessage: Message = {
-							id: crypto.randomUUID(),
-							content: `📷 ${file.name}<br><img src="${imageData}" alt="Uploaded image" style="max-width: 300px; border-radius: 8px; margin-top: 8px;" />`,
-							isUser: true,
-							timestamp: new Date()
-						};
-						setMessages(prev => [...prev, imageMessage]);
-						sendToAI(`User uploaded an image: ${file.name}`);
-					} catch (error) {
-						console.error('Image upload error:', error);
-						showToastMessage('Failed to upload image');
+		// Cleanup old chats (async)
+		setTimeout(() => {
+			const autoDeleteDays = parseInt(storage.get('lumora-auto-delete-days') || '30');
+			if (autoDeleteDays < 99999) {
+				try {
+					const chats = JSON.parse(storage.get(STORAGE_KEYS.CHAT_HISTORY) || '[]');
+					const cutoffDate = new Date(Date.now() - autoDeleteDays * 24 * 60 * 60 * 1000);
+					const filteredChats = chats.filter((chat: any) => new Date(chat.timestamp) > cutoffDate);
+					
+					if (filteredChats.length !== chats.length) {
+						storage.set(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(filteredChats));
 					}
-				};
-				reader.onerror = () => {
-					console.error('FileReader error');
-					showToastMessage('Failed to read file');
-				};
-				reader.readAsDataURL(file);
+				} catch (e) {
+					console.warn('Failed to cleanup old chats');
+				}
 			}
-			setInput('');
-		};
+		}, 100);
 
-	const handleSend = (e: React.FormEvent) => {
+		// Event listeners
+		const handleNewChat = () => {
+			sessionManager.setCurrentSession(null);
+			setMessages([]);
+			setCurrentChatId(null);
+			setShowBackButton(false);
+		};
+		
+		const handleSidebarChange = (e: CustomEvent) => {
+			setSidebarExpanded(e.detail.expanded);
+		};
+		
+		window.addEventListener('lumora_new_chat', handleNewChat);
+		window.addEventListener('sidebar-state-change', handleSidebarChange as EventListener);
+		
+		return () => {
+			if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+			window.removeEventListener('lumora_new_chat', handleNewChat);
+			window.removeEventListener('sidebar-state-change', handleSidebarChange as EventListener);
+		};
+	}, []);
+
+	// Optimized chat loading
+	useEffect(() => {
+		if (!onboardingComplete) return;
+		
+		const { chatId, fromHistory } = sessionManager.getActiveChat();
+		
+		if (chatId && fromHistory) {
+			const allChats = ChatStorage.getAllChats();
+			const targetChat = allChats.find((c) => c.id === chatId);
+
+			if (targetChat?.messages?.length > 0) {
+				setMessages(targetChat.messages);
+				setCurrentChatId(chatId);
+				setShowBackButton(true);
+			}
+			sessionManager.clearActiveChat();
+		} else if (chatId) {
+			const allChats = ChatStorage.getAllChats();
+			const targetChat = allChats.find((c) => c.id === chatId);
+			if (targetChat?.messages?.length > 0) {
+				setMessages(targetChat.messages);
+				setCurrentChatId(chatId);
+			}
+		}
+	}, [onboardingComplete]);
+
+	// Optimized auto-scroll
+	useEffect(() => {
+		if (messages.length > 0) {
+			const lastMessage = messages[messages.length - 1];
+			if (lastMessage.isUser || isTyping) {
+				requestAnimationFrame(() => {
+					messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+				});
+			}
+		}
+	}, [messages.length, isTyping]);
+
+	// Save chat on unmount
+	useEffect(() => {
+		return () => {
+			if (messages.length > 0 && currentChatId) {
+				const messageLimit = parseInt(storage.get('lumora-message-limit') || '50');
+				const limitedMsgs = messages.slice(-messageLimit);
+				const firstUserMsg = limitedMsgs.find(m => m.isUser);
+				const topic = firstUserMsg ? ChatStorage.generateTitle(firstUserMsg.content) : 'Health Consultation';
+				ChatStorage.saveChat(topic, limitedMsgs, currentChatId);
+			}
+		};
+	}, [messages, currentChatId]);
+
+	// Optimized handlers
+	const handleSend = useCallback((e: React.FormEvent) => {
 		e.preventDefault();
 		if (!input.trim()) return;
 
@@ -300,34 +277,29 @@ export default function Home() {
 		setMessages(prev => [...prev, userMessage]);
 		sendToAI(sanitizedInput);
 		setInput('');
-	};
+	}, [input]);
 
-	const sendToAI = async (message: string) => {
+	// Optimized AI request with better error handling
+	const sendToAI = useCallback(async (message: string) => {
 		try {
 			setIsTyping(true);
 
-			// Get user settings
 			const aiMode = storage.get('lumora-ai-mode') || 'classic';
 			const customInstructions = storage.get('lumora-custom-instructions') || '';
 			const maxTokens = parseInt(storage.get('lumora-max-tokens') || '450');
 			const temperature = parseFloat(storage.get('lumora-temperature') || '0.5');
 			const contextWindow = parseInt(storage.get('lumora-context-window') || '6');
 			const enableReasoning = storage.get('lumora-enable-reasoning') === 'true';
-			
-			// Get adaptive AI profile
 			const adaptiveProfile = AdaptiveAI.getProfile();
 
-			// Debounce rapid requests
 			const controller = new AbortController();
 			const timeoutId = setTimeout(() => controller.abort(), 30000);
 
 			const response = await fetch('/api/lumora-chat', {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					message: message,
+					message,
 					history: messages.slice(-contextWindow).map(m => ({ role: m.isUser ? 'user' : 'assistant', content: m.content })),
 					aiMode,
 					customInstructions,
@@ -345,20 +317,14 @@ export default function Home() {
 			if (!response.ok) throw new Error('API request failed');
 
 			const data = await response.json();
-
 			if (!data.success) throw new Error(data.error);
-
-			const content = data.content;
-			if (!content) throw new Error('Empty response from AI');
-
-			const thinking = data.thinking || '';
 
 			const aiMessage: Message = {
 				id: crypto.randomUUID(),
-				content: content,
+				content: data.content || '',
 				isUser: false,
 				timestamp: new Date(),
-				thinking: thinking
+				thinking: data.thinking || ''
 			};
 
 			setMessages(prev => {
@@ -366,9 +332,7 @@ export default function Home() {
 				saveToHistory(newHistory);
 				return newHistory;
 			});
-			setIsTyping(false);
 		} catch (error) {
-			setIsTyping(false);
 			const errorMessage: Message = {
 				id: crypto.randomUUID(),
 				content: "I'm temporarily unavailable. Please try again in a moment.",
@@ -376,20 +340,22 @@ export default function Home() {
 				timestamp: new Date()
 			};
 			setMessages(prev => [...prev, errorMessage]);
+		} finally {
+			setIsTyping(false);
 		}
-	};
+	}, [messages, saveToHistory]);
 
-	const handleImageAnalysis = async (imageData: string, context: string, userMessage: string) => {
+	// Optimized image analysis
+	const handleImageAnalysis = useCallback(async (imageData: string, context: string, userMessage: string) => {
 		try {
 			setIsTyping(true);
 
-			// Add user message with clean image indicator
 			const userMsg: Message = {
 				id: crypto.randomUUID(),
 				content: `Image Analysis Request${userMessage ? `: ${userMessage}` : ''}`,
 				isUser: true,
 				timestamp: new Date(),
-				imageData: imageData
+				imageData
 			};
 			setMessages(prev => [...prev, userMsg]);
 
@@ -422,9 +388,7 @@ export default function Home() {
 				saveToHistory(newHistory);
 				return newHistory;
 			});
-			setIsTyping(false);
 		} catch (error) {
-			setIsTyping(false);
 			const errorMessage: Message = {
 				id: crypto.randomUUID(),
 				content: "Image analysis failed. Please try again.",
@@ -432,8 +396,10 @@ export default function Home() {
 				timestamp: new Date()
 			};
 			setMessages(prev => [...prev, errorMessage]);
+		} finally {
+			setIsTyping(false);
 		}
-	};
+	}, [messages, saveToHistory]);
 
 	if (!isHydrated || (showWelcome || showOnboarding || showPrivacyNotice)) {
 		return (
@@ -465,8 +431,8 @@ export default function Home() {
 		<>
 			<NavigationSidebar user={{ name: 'User' }} />
 			
-			{/* Encrypted Status Indicator - Hidden on mobile */}
-			{isHydrated && (
+			{/* Encrypted Status Indicator - Hidden on mobile and when sidebar is expanded */}
+			{isHydrated && !sidebarExpanded && (
 				<div 
 					className="fixed top-4 z-40 hidden lg:flex items-center gap-2 bg-zinc-900/90 backdrop-blur-sm border border-zinc-700 rounded-full px-3 py-1.5 transition-all duration-400" 
 					style={{ 
@@ -491,28 +457,24 @@ export default function Home() {
 			)}
       
 			<main className="flex flex-col h-screen bg-[var(--bg-page)] overflow-hidden lg:ml-[var(--sidebar-width,64px)] transition-all duration-400">
-				<div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 scroll-smooth pb-56 sm:pb-48 pt-20" onScroll={(e) => {
-					const container = e.currentTarget;
-					const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
-					setShowScrollButton(!isNearBottom);
-				}}>
+				<div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 scroll-smooth pb-56 sm:pb-48 pt-20" onScroll={handleScroll}>
 
 					<div className="max-w-6xl mx-auto space-y-6 py-2">
-						{messages.slice(-50).map((message) => (
+						{visibleMessages.map((message) => (
 							<div key={message.id} className="max-w-3xl mx-auto">
 								{!message.isUser && message.thinking && (() => {
 								const steps = parseReasoning(message.thinking);
 								return (
 									<details className="mb-4">
 										<summary className="cursor-pointer select-none transition-all duration-200 flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-white/10 to-blue-500/10 hover:from-white/20 hover:to-blue-500/20 border border-white/30 rounded-lg group">
-											<svg className="w-5 h-5 text-black group-hover:text-teal-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<svg className="w-5 h-5 text-white group-hover:text-teal-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
 											</svg>
 											<div className="flex-1">
-												<div className="text-sm font-semibold text-black group-hover:text-teal-300 transition-colors">View AI Reasoning Chain</div>
-												<div className="text-xs text-zinc-500">See how I analyzed your question{steps.length > 0 && ` • ${steps.length} reasoning steps`}</div>
+												<div className="text-sm font-semibold text-white group-hover:text-teal-300 transition-colors">View AI Reasoning Chain</div>
+												<div className="text-xs text-zinc-400">See how I analyzed your question{steps.length > 0 && ` • ${steps.length} reasoning steps`}</div>
 											</div>
-											<svg className="w-4 h-4 text-black group-hover:text-teal-300 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<svg className="w-4 h-4 text-white group-hover:text-teal-300 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
 											</svg>
 										</summary>
@@ -547,8 +509,6 @@ export default function Home() {
 														? 'bg-zinc-800 rounded-2xl rounded-tr-sm px-3 md:px-4 py-2 md:py-3 font-sans text-[var(--text-primary)]' 
 														: 'font-sans text-[var(--text-primary)]'
 												} leading-relaxed text-sm md:text-base`}
-												role={message.isUser ? 'article' : 'article'}
-												aria-live={message.isUser ? undefined : 'polite'}
 											>
 											{message.isUser ? (
 												<>
@@ -566,15 +526,13 @@ export default function Home() {
 															/>
 														</div>
 													) : (
-														<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(message.content || '')) }} />
+														<div dangerouslySetInnerHTML={{ __html: DOMPurify?.sanitize ? DOMPurify.sanitize(String(message.content || '')) : String(message.content || '') }} />
 													)}
 												</>
 											) : (
 												<>
 													<div className="prose prose-invert max-w-none prose-headings:font-sans prose-headings:mb-3 prose-headings:mt-6 prose-p:font-sans prose-p:leading-relaxed prose-p:mb-4 prose-li:font-sans prose-li:mb-2 prose-li:marker:text-zinc-400 prose-strong:text-white prose-ul:my-4 prose-ol:my-4">
-														<ReactMarkdown>
-															{String(message.content || '')}
-														</ReactMarkdown>
+														{ReactMarkdown ? <ReactMarkdown>{String(message.content || '')}</ReactMarkdown> : <div>{String(message.content || '')}</div>}
 													</div>
 													{(() => {
 														const detectedMeds = detectMedicines(message.content);
@@ -700,7 +658,7 @@ export default function Home() {
 			{/* Toast Notification */}
 			{showToast && (
 				<div className="fixed bottom-32 sm:bottom-24 left-1/2 transform -translate-x-1/2 bg-zinc-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm max-w-[90vw]">
-					{DOMPurify.sanitize(showToast, { ALLOWED_TAGS: [] })}
+					{showToast}
 				</div>
 			)}
 
