@@ -1,11 +1,11 @@
 {
-  "name": "Lumora - AI Mental Health Companion",
+  "name": "Lumora - AI Health Assistant",
   "short_name": "Lumora",
-  "description": "Professional AI-powered mental health support and symptom analysis platform",
+  "description": "Privacy-first AI health intelligence platform powered by xAI Grok-4",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#007bff",
+  "background_color": "#000000",
+  "theme_color": "#14b8a6",
   "orientation": "portrait-primary",
   "scope": "/",
   "categories": ["health", "medical", "lifestyle"],
@@ -13,37 +13,37 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "/icon-192x192.png",
+      "src": "/lumora-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/icon-512x512.png",
+      "src": "/lumora-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/apple-touch-icon.png",
+      "src": "/lumora-icon-180.png",
       "sizes": "180x180",
       "type": "image/png"
     }
   ],
   "shortcuts": [
     {
-      "name": "Start Chat",
+      "name": "Start Consultation",
       "short_name": "Chat",
-      "description": "Begin health conversation",
+      "description": "Begin health consultation",
       "url": "/",
-      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/lumora-icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "View Progress",
-      "short_name": "Progress",
-      "description": "Check health progress",
-      "url": "/progress",
-      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+      "name": "View History",
+      "short_name": "History",
+      "description": "Check consultation history",
+      "url": "/history",
+      "icons": [{ "src": "/lumora-icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

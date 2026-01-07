@@ -14,18 +14,32 @@ export function useNotifications() {
   }, []);
 
   const toggleNotifications = async () => {
-    if (!notificationsEnabled && 'Notification' in window) {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        setNotificationsEnabled(true);
-        localStorage.setItem('notificationsEnabled', 'true');
-        toast.success('Notifications enabled!');
+    if (!notificationsEnabled) {
+      if ('Notification' in window) {
+        try {
+          const permission = await Notification.requestPermission();
+          if (permission === 'granted') {
+            setNotificationsEnabled(true);
+            localStorage.setItem('notificationsEnabled', 'true');
+            toast.success('Notifications enabled!');
+            // Test notification
+            new Notification('Lumora', {
+              body: 'Notifications are now enabled!',
+              icon: '/lumora-icon-192.png'
+            });
+          } else {
+            toast.error('Notification permission denied. Please enable in browser settings.');
+          }
+        } catch (error) {
+          toast.error('Failed to request notification permission.');
+        }
       } else {
-        toast.error('Please enable notifications in your browser settings.');
+        toast.error('Notifications not supported on this device.');
       }
     } else {
       setNotificationsEnabled(false);
       localStorage.setItem('notificationsEnabled', 'false');
+      toast.success('Notifications disabled');
     }
   };
 

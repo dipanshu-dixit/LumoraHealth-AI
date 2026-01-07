@@ -23,7 +23,7 @@ const DynamicWelcome = dynamic(() => import('./components/DynamicWelcome'), { ss
 const PrivacyNoticeModal = dynamic(() => import('./components/PrivacyNoticeModal'), { ssr: false, loading: () => null });
 const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false, loading: () => <div>Loading...</div> });
 const ReasoningTree = dynamic(() => import('./components/ReasoningTree'), { ssr: false, loading: () => null });
-const DOMPurify = dynamic(() => import('isomorphic-dompurify'), { ssr: false });
+const DOMPurify = dynamic(() => import('isomorphic-dompurify').then(mod => ({ default: mod.default })), { ssr: false });
 
 interface Message {
 	id: string;
@@ -526,7 +526,7 @@ export default function Home() {
 															/>
 														</div>
 													) : (
-														<div dangerouslySetInnerHTML={{ __html: DOMPurify?.sanitize ? DOMPurify.sanitize(String(message.content || '')) : String(message.content || '') }} />
+														<div>{String(message.content || '')}</div>
 													)}
 												</>
 											) : (

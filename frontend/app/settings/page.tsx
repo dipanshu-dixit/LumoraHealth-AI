@@ -121,8 +121,8 @@ export default function Settings() {
 					}}
 				/>
       
-			<div className="max-w-6xl mx-auto px-6 py-6 pt-8 pb-40">
-					<h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-8 font-sans">
+			<div className="max-w-6xl mx-auto px-6 py-6 pt-4 pb-32 lg:pb-40">
+					<h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-6 font-sans">
 						Settings
 					</h1>
 
@@ -214,16 +214,16 @@ export default function Settings() {
 								</div>
 								{/* Reserve space for toggle to prevent layout shift */}
 								<div className="h-6">
-									{mounted && (
+									{mounted && notificationsMounted && (
 										<button
 											onClick={toggleNotifications}
 											className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black ${
-												notificationsMounted && notificationsEnabled ? 'bg-teal-500' : 'bg-zinc-700'
+												notificationsEnabled ? 'bg-teal-500' : 'bg-zinc-700'
 											}`}
 										>
 											<span
 												className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-													notificationsMounted && notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
+													notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
 												}`}
 											/>
 										</button>

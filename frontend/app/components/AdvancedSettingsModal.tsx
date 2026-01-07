@@ -25,12 +25,56 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
   const [enableReasoning, setEnableReasoning] = useState(false);
   const [autoDeleteDays, setAutoDeleteDays] = useState(30);
   const [messageLimit, setMessageLimit] = useState(50);
+  const [customInstructions, setCustomInstructions] = useState('');
+  const [hasInstructionsChanges, setHasInstructionsChanges] = useState(false);
   
   // Debounce refs for notifications
   const tokenTimeoutRef = useRef<NodeJS.Timeout>();
   const tempTimeoutRef = useRef<NodeJS.Timeout>();
   const contextTimeoutRef = useRef<NodeJS.Timeout>();
   const instructionsTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const handleMaxTokensChange = useCallback((value: number) => {
+    setMaxTokens(value);
+    storage.set('lumora-max-tokens', value.toString());
+    
+    if (tokenTimeoutRef.current) clearTimeout(tokenTimeoutRef.current);
+    tokenTimeoutRef.current = setTimeout(() => {
+      toast.success(`Max tokens set to ${value}`);
+    }, 500);
+  }, []);
+
+  const handleTemperatureChange = useCallback((value: number) => {
+    setTemperature(value);
+    storage.set('lumora-temperature', value.toString());
+    
+    if (tempTimeoutRef.current) clearTimeout(tempTimeoutRef.current);
+    tempTimeoutRef.current = setTimeout(() => {
+      toast.success(`Temperature set to ${value}`);
+    }, 500);
+  }, []);
+
+  const handleContextWindowChange = useCallback((value: number) => {
+    setContextWindow(value);
+    storage.set('lumora-context-window', value.toString());
+    
+    if (contextTimeoutRef.current) clearTimeout(contextTimeoutRef.current);
+    contextTimeoutRef.current = setTimeout(() => {
+      toast.success(`Context window set to ${value} messages`);
+    }, 500);
+  }, []);
+
+  const handleCustomInstructionsChange = useCallback((value: string) => {
+    setCustomInstructions(value);
+    const original = storage.get('lumora-custom-instructions') || '';
+    setHasInstructionsChanges(value !== original);
+  }, []);
+
+  const handleSaveInstructions = useCallback(() => {
+    storage.set('lumora-custom-instructions', customInstructions);
+    setHasInstructionsChanges(false);
+    toast.success('Custom instructions saved!');
+  }, [customInstructions]);
 
   useEffect(() => {
     if (isOpen) {
@@ -42,6 +86,7 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
       setEnableReasoning(storage.get('lumora-enable-reasoning') === 'true');
       setAutoDeleteDays(parseInt(storage.get('lumora-auto-delete-days') || '30'));
       setMessageLimit(parseInt(storage.get('lumora-message-limit') || '50'));
+      setCustomInstructions(storage.get('lumora-custom-instructions') || '');
     }
   }, [isOpen]);
 
@@ -78,45 +123,6 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
       setTestStatus('failed');
     }
   };
-
-  const handleMaxTokensChange = useCallback((value: number) => {
-    setMaxTokens(value);
-    storage.set('lumora-max-tokens', value.toString());
-    
-    if (tokenTimeoutRef.current) clearTimeout(tokenTimeoutRef.current);
-    tokenTimeoutRef.current = setTimeout(() => {
-      toast.success(`Max tokens set to ${value}`);
-    }, 500);
-  }, []);
-
-  const handleTemperatureChange = useCallback((value: number) => {
-    setTemperature(value);
-    storage.set('lumora-temperature', value.toString());
-    
-    if (tempTimeoutRef.current) clearTimeout(tempTimeoutRef.current);
-    tempTimeoutRef.current = setTimeout(() => {
-      toast.success(`Temperature set to ${value}`);
-    }, 500);
-  }, []);
-
-  const handleContextWindowChange = useCallback((value: number) => {
-    setContextWindow(value);
-    storage.set('lumora-context-window', value.toString());
-    
-    if (contextTimeoutRef.current) clearTimeout(contextTimeoutRef.current);
-    contextTimeoutRef.current = setTimeout(() => {
-      toast.success(`Context window set to ${value} messages`);
-    }, 500);
-  }, []);
-
-  const handleCustomInstructionsChange = useCallback((value: string) => {
-    storage.set('lumora-custom-instructions', value);
-    
-    if (instructionsTimeoutRef.current) clearTimeout(instructionsTimeoutRef.current);
-    instructionsTimeoutRef.current = setTimeout(() => {
-      toast.success('Custom instructions updated!');
-    }, 1000);
-  }, []);
 
   const toggleMarkdown = () => {
     const newValue = !enableMarkdown;
@@ -292,13 +298,24 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
                   <label className="text-white font-medium">Custom Instructions</label>
                 </div>
                 <textarea
-                  defaultValue={storage.get('lumora-custom-instructions') || ''}
+                  value={customInstructions}
                   onChange={(e) => handleCustomInstructionsChange(e.target.value)}
                   placeholder="e.g., I have diabetes, I'm sensitive to light, I prefer natural remedies, I'm a healthcare worker..."
                   rows={4}
                   className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all resize-none"
                 />
                 <p className="text-xs text-zinc-500 mt-2">AI will consider these details in all responses</p>
+                {hasInstructionsChanges && (
+                  <button
+                    onClick={handleSaveInstructions}
+                    className="mt-3 bg-white hover:bg-zinc-100 text-black px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save Instructions
+                  </button>
+                )}
               </div>
             </div>
           </div>

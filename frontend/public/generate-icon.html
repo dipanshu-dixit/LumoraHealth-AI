@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Lumora Icon</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Black circular background
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(256, 256, 256, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // White cursive Lumora text
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 120px "Brush Script MT", cursive';
+        ctx.textAlign = 'center';
+        ctx.fillText('Lumora', 256, 290);
+        
+        // Download function
+        function downloadIcon(size, filename) {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(canvas, 0, 0, size, size);
+            
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = tempCanvas.toDataURL();
+            link.click();
+        }
+        
+        // Auto download icons
+        setTimeout(() => {
+            downloadIcon(192, 'lumora-icon-192.png');
+            setTimeout(() => downloadIcon(512, 'lumora-icon-512.png'), 500);
+            setTimeout(() => downloadIcon(180, 'lumora-icon-180.png'), 1000);
+        }, 1000);
+    </script>
+</body>
+</html>
