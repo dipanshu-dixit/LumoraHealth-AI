@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import StatusHeader from './StatusHeader';
-import { storage, SESSION_KEYS, STORAGE_KEYS } from '@/lib/storage';
+import { storage, SESSION_KEYS, STORAGE_KEYS } from '../../src/lib/storage';
 import { useUser } from '../hooks/useUser';
 
 interface UniversalHeaderProps {
@@ -84,14 +84,14 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({
     >
       <motion.button
         onClick={() => window.dispatchEvent(new CustomEvent('toggle-drawer'))}
-        className="lg:hidden bg-zinc-900/90 border border-zinc-800 rounded-full p-2 text-zinc-400 hover:text-white transition-colors"
+        className="lg:hidden bg-zinc-900/90 border border-zinc-800 rounded-full p-2 text-zinc-400 hover:text-white transition-colors flex items-center justify-center"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="3" y1="12" x2="21" y2="12"/>
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <line x1="3" y1="18" x2="21" y2="18"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <line x1="4" y1="6" x2="20" y2="6"/>
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <line x1="4" y1="18" x2="20" y2="18"/>
         </svg>
       </motion.button>
 

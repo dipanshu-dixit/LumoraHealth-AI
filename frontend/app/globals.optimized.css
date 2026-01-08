@@ -166,7 +166,7 @@ img {
 .large-text body,
 .large-text .prose,
 .large-text p,
-.large-text span,
+.large-text span:not(.lumora-logo),
 .large-text div,
 .large-text button,
 .large-text input,

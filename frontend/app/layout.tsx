@@ -1,12 +1,10 @@
 import type { Metadata } from 'next'
 import { Inter, Lora } from 'next/font/google'
 import './globals.optimized.css'
-import Footer from './components/Footer'
 import MobileDrawer from './components/MobileDrawer'
 import UniversalHeader from './components/UniversalHeader'
 import { GlobalErrorBoundary } from './components/GlobalErrorBoundary'
 import StorageWarning from './components/StorageWarning'
-import LoadingOverlay from './components/LoadingOverlay'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -76,7 +74,6 @@ export default function RootLayout({
       </head>
       <body className="bg-void text-starlight font-sans antialiased h-screen overflow-hidden transition-colors duration-300">
         <GlobalErrorBoundary>
-          <LoadingOverlay />
           <StorageWarning />
           <UniversalHeader />
           <div className="transition-all duration-400 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] pl-0 lg:pl-[var(--sidebar-width,64px)] h-screen overflow-hidden pt-16 md:pt-16">

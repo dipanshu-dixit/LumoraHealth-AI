@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { X, MessageSquarePlus, History, LayoutDashboard, Settings, MessageCircle, Pill, LogOut, Plus } from 'lucide-react';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { storage, STORAGE_KEYS } from '../../src/lib/storage';
 import { UserAvatar } from './UserAvatar';
 
 const MobileDrawer = React.memo(() => {

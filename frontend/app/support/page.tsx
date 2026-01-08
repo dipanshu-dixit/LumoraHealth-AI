@@ -59,7 +59,7 @@ export default function Support() {
                 <button
                   key={category}
                   onClick={() => setActiveCategory(category)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
                     activeCategory === category
                       ? 'bg-white text-black'
                       : 'bg-zinc-800 text-[var(--text-secondary)] hover:bg-zinc-700'

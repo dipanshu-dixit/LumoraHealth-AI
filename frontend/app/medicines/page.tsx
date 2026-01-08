@@ -147,7 +147,7 @@ function MedicinesContent() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 text-white p-2.5 sm:p-3 rounded-lg transition-all disabled:text-zinc-500"
+                    className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 text-white p-2.5 sm:p-3 rounded-lg transition-all disabled:text-zinc-500 flex items-center justify-center"
                   >
                     {isLoading ? (
                       <div className="w-4 h-4 border-2 border-zinc-500 border-t-white rounded-full animate-spin" />

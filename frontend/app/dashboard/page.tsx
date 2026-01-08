@@ -715,18 +715,18 @@ export default function Dashboard() {
               </div>
               
               <div className="space-y-3">
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-stretch">
                   <input
                     type="text"
                     value={quickNote}
                     onChange={(e) => setQuickNote(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && addQuickNote()}
                     placeholder="Add a health observation..."
-                    className="flex-1 bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:border-teal-500 transition-colors"
+                    className="flex-1 min-w-0 bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:border-teal-500 transition-colors"
                   />
                   <button
                     onClick={addQuickNote}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center min-w-[48px]"
+                    className="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center flex-shrink-0"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -766,18 +766,18 @@ export default function Dashboard() {
               </div>
               
               <div className="space-y-3">
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-stretch">
                   <input
                     type="text"
                     value={newGoal}
                     onChange={(e) => setNewGoal(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && addHealthGoal()}
                     placeholder="Set a health objective..."
-                    className="flex-1 bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:border-teal-500 transition-colors"
+                    className="flex-1 min-w-0 bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:border-teal-500 transition-colors"
                   />
                   <button
                     onClick={addHealthGoal}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center min-w-[48px]"
+                    className="w-12 h-12 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center justify-center flex-shrink-0"
                   >
                     <Plus className="w-4 h-4" />
                   </button>

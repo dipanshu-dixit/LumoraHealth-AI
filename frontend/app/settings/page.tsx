@@ -134,7 +134,7 @@ export default function Settings() {
 			action: () => hasAdvancedAccess ? setShowAdvanced(true) : setShowAdvancedAccess(true), 
 			icon: SettingsIcon 
 		}
-	], []);
+	], [hasAdvancedAccess]);
 
 	return (
 		<>
@@ -152,7 +152,7 @@ export default function Settings() {
 				/>
       
 			<div className="max-w-6xl mx-auto px-6 py-6 pb-32 lg:pb-40 mt-16">
-					<h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-6 font-sans">
+					<h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-12 pb-2 font-sans">
 						Settings
 					</h1>
 
@@ -249,15 +249,13 @@ export default function Settings() {
 									{mounted && notificationsMounted && (
 										<button
 											onClick={toggleNotifications}
-											className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
-												notificationsEnabled ? 'bg-teal-500' : 'bg-zinc-600'
+											className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
+												notificationsEnabled 
+													? 'bg-teal-500 border-teal-500 text-white shadow-lg shadow-teal-500/25' 
+													: 'bg-zinc-700 border-zinc-600 text-zinc-300 hover:bg-zinc-600'
 											}`}
 										>
-											<span
-												className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-													notificationsEnabled ? 'translate-x-5' : 'translate-x-0'
-												}`}
-											/>
+											{notificationsEnabled ? 'ON' : 'OFF'}
 										</button>
 									)}
 								</div>
@@ -270,15 +268,13 @@ export default function Settings() {
 									{mounted && (
 										<button
 											onClick={toggleLargeText}
-											className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
-												largeText ? 'bg-teal-500' : 'bg-zinc-600'
+											className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
+												largeText 
+													? 'bg-teal-500 border-teal-500 text-white shadow-lg shadow-teal-500/25' 
+													: 'bg-zinc-700 border-zinc-600 text-zinc-300 hover:bg-zinc-600'
 											}`}
 										>
-											<span
-												className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-													largeText ? 'translate-x-5' : 'translate-x-0'
-												}`}
-											/>
+											{largeText ? 'ON' : 'OFF'}
 										</button>
 									)}
 								</div>
@@ -325,7 +321,7 @@ export default function Settings() {
 
 						<div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:bg-zinc-800/80 transition-all flex items-center justify-center">
 							<span 
-								className="text-6xl font-bold text-white tracking-wide"
+								className="text-6xl font-bold text-white tracking-wide large-text:text-8xl lumora-logo"
 								style={{ fontFamily: 'Brush Script MT, cursive' }}
 							>
 								Lumora

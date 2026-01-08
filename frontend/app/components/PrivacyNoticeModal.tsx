@@ -35,29 +35,44 @@ export default function PrivacyNoticeModal({ onComplete }: PrivacyNoticeModalPro
         </div>
 
         <div id="privacy-description" className="space-y-4 mb-8 text-gray-300">
-          <div className="flex gap-3">
+          <motion.div 
+            className="flex gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
             <Lock className="w-5 h-5 text-white flex-shrink-0 mt-1" />
             <div>
               <p className="font-medium bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 bg-clip-text text-transparent">Zero-Knowledge Architecture</p>
               <p className="text-sm text-gray-400">All data is stored locally in your browser only</p>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="flex gap-3">
+          <motion.div 
+            className="flex gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+          >
             <Database className="w-5 h-5 text-white flex-shrink-0 mt-1" />
             <div>
               <p className="font-medium bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 bg-clip-text text-transparent">No Database, No Collection</p>
               <p className="text-sm text-gray-400">We don't collect, store, or transmit your personal data</p>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="flex gap-3">
+          <motion.div 
+            className="flex gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+          >
             <Trash2 className="w-5 h-5 text-amber-400 flex-shrink-0 mt-1" />
             <div>
               <p className="font-medium bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 bg-clip-text text-transparent">Important Notice</p>
               <p className="text-sm text-gray-400">Clearing browser cache or history will permanently delete all your data</p>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         <motion.button
@@ -67,7 +82,7 @@ export default function PrivacyNoticeModal({ onComplete }: PrivacyNoticeModalPro
           whileTap={{ scale: 0.98 }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.3 }}
+          transition={{ delay: 0.8, duration: 0.3 }}
         >
           I Understand
         </motion.button>

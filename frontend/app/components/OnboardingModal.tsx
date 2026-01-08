@@ -7,7 +7,7 @@ interface OnboardingModalProps {
 	onComplete: () => void;
 }
 
-import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { storage, STORAGE_KEYS } from '../../src/lib/storage';
 
 export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
 	const [step, setStep] = useState(1);

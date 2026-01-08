@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Shield, Lock, CheckCircle, XCircle, AlertTriangle, Zap, Database, Code, Settings, Bell } from 'lucide-react';
 import { secureStorage } from '@/lib/secureStorage';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { storage, STORAGE_KEYS } from '../../src/lib/storage';
 import toast from 'react-hot-toast';
 import StorageUsageCard from './StorageUsageCard';
 
@@ -395,9 +395,13 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
                 </div>
                 <button
                   onClick={toggleMarkdown}
-                  className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableMarkdown ? 'bg-teal-500' : 'bg-zinc-600'}`}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
+                    enableMarkdown 
+                      ? 'bg-teal-500 border-teal-500 text-white shadow-lg shadow-teal-500/25' 
+                      : 'bg-zinc-700 border-zinc-600 text-zinc-300 hover:bg-zinc-600'
+                  }`}
                 >
-                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${enableMarkdown ? 'translate-x-5' : 'translate-x-0'}`} />
+                  {enableMarkdown ? 'ON' : 'OFF'}
                 </button>
               </div>
 
@@ -408,9 +412,13 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
                 </div>
                 <button
                   onClick={toggleAnimations}
-                  className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableAnimations ? 'bg-teal-500' : 'bg-zinc-600'}`}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
+                    enableAnimations 
+                      ? 'bg-teal-500 border-teal-500 text-white shadow-lg shadow-teal-500/25' 
+                      : 'bg-zinc-700 border-zinc-600 text-zinc-300 hover:bg-zinc-600'
+                  }`}
                 >
-                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${enableAnimations ? 'translate-x-5' : 'translate-x-0'}`} />
+                  {enableAnimations ? 'ON' : 'OFF'}
                 </button>
               </div>
 
@@ -421,9 +429,13 @@ export default function AdvancedSettingsModal({ isOpen, onClose }: AdvancedSetti
                 </div>
                 <button
                   onClick={toggleReasoning}
-                  className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${enableReasoning ? 'bg-teal-500' : 'bg-zinc-600'}`}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border ${
+                    enableReasoning 
+                      ? 'bg-teal-500 border-teal-500 text-white shadow-lg shadow-teal-500/25' 
+                      : 'bg-zinc-700 border-zinc-600 text-zinc-300 hover:bg-zinc-600'
+                  }`}
                 >
-                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${enableReasoning ? 'translate-x-5' : 'translate-x-0'}`} />
+                  {enableReasoning ? 'ON' : 'OFF'}
                 </button>
               </div>
           </div>

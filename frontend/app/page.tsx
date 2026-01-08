@@ -449,7 +449,7 @@ export default function Home() {
 			{showBackButton && (
 				<button
 					onClick={() => router.push('/history')}
-					className="fixed top-4 left-4 lg:left-[calc(var(--sidebar-width,64px)+1rem)] z-40 px-3 py-1.5 flex items-center gap-2 text-zinc-400 hover:text-black transition-colors group bg-zinc-900/90 backdrop-blur-sm border border-zinc-700 rounded-full"
+					className="hidden lg:flex fixed top-4 left-[calc(var(--sidebar-width,64px)+1rem)] z-40 px-3 py-1.5 items-center gap-2 text-zinc-400 hover:text-black transition-colors group bg-zinc-900/90 backdrop-blur-sm border border-zinc-700 rounded-full"
 				>
 					<ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
 					<span className="text-sm font-medium">Back to History</span>
@@ -457,7 +457,7 @@ export default function Home() {
 			)}
       
 			<main className="flex flex-col h-screen bg-[var(--bg-page)] overflow-hidden lg:ml-[var(--sidebar-width,64px)] transition-all duration-400">
-				<div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 scroll-smooth pb-56 sm:pb-48 pt-20" onScroll={handleScroll}>
+				<div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 scroll-smooth pb-56 sm:pb-48 pt-16 sm:pt-18 lg:pt-20" onScroll={handleScroll}>
 
 					<div className="max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto space-y-6 py-2">
 						{visibleMessages.map((message) => (
@@ -506,7 +506,7 @@ export default function Home() {
 											<div
 												className={`${
 													message.isUser 
-														? 'bg-zinc-800 rounded-2xl rounded-tr-sm px-3 md:px-4 py-2 md:py-3 font-sans text-[var(--text-primary)]' 
+														? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl rounded-tr-md px-4 py-3 font-sans shadow-lg border border-blue-500/20' 
 														: 'font-sans text-[var(--text-primary)]'
 												} leading-relaxed text-sm md:text-base`}
 											>
@@ -521,7 +521,7 @@ export default function Home() {
 															<img 
 																src={message.imageData} 
 																alt="Uploaded" 
-																className="max-w-xs rounded-lg border border-zinc-700 cursor-pointer hover:opacity-80 transition-opacity"
+																className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-lg border border-zinc-700 cursor-pointer hover:opacity-80 transition-opacity"
 																onClick={() => setSelectedImage(message.imageData!)}
 															/>
 														</div>
@@ -574,35 +574,35 @@ export default function Home() {
 												<div className="flex items-center gap-1 mt-2">
 													<button 
 														onClick={() => handleLike(message.id)}
-														className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
+														className={`p-1.5 rounded-md transition-colors flex items-center justify-center ${
 															likedMessages.has(message.id) 
 																? 'bg-green-500/20 text-green-400' 
 																: 'text-zinc-500 hover:text-green-400 hover:bg-green-500/10'
 														}`} 
 														title="Like"
 													>
-														<ThumbsUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+														<ThumbsUp className="w-3.5 h-3.5" />
 													</button>
 													<button 
 														onClick={() => handleDislike(message.id)}
-														className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
+														className={`p-1.5 rounded-md transition-colors flex items-center justify-center ${
 															dislikedMessages.has(message.id) 
 																? 'bg-red-500/20 text-red-400' 
 																: 'text-zinc-500 hover:text-red-400 hover:bg-red-500/10'
 														}`} 
 														title="Dislike"
 													>
-														<ThumbsDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+														<ThumbsDown className="w-3.5 h-3.5" />
 													</button>
 													<button 
 														onClick={() => {
 															navigator.clipboard.writeText(message.content);
 															showToastMessage('Copied to clipboard!');
 														}}
-														className="p-1.5 sm:p-2 text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors" 
+														className="p-1.5 text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-md transition-colors flex items-center justify-center" 
 														title="Copy"
 													>
-														<Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+														<Copy className="w-3.5 h-3.5" />
 													</button>
 												</div>
 											)}

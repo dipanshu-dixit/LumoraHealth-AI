@@ -243,7 +243,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </AnimatePresence>
 
           {/* Main Input Container */}
-          <div className="relative bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 rounded-2xl px-2 sm:px-4 py-2 sm:py-3 shadow-lg hover:border-zinc-600/50 transition-all duration-200 focus-within:border-white/50/50 focus-within:shadow-white/10/10">
+          <div className="relative bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 rounded-2xl px-2 sm:px-4 py-2 sm:py-3 shadow-lg hover:border-zinc-600/50 transition-all duration-200">
             <div className="flex items-end gap-1 sm:gap-3">
               {/* Plus Button */}
               <div className="relative" ref={imageMenuRef}>
@@ -318,7 +318,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 onKeyDown={handleKeyDown}
                 placeholder="Ask Lumora anything..."
                 disabled={isLoading}
-                className="flex-1 bg-transparent text-white placeholder-zinc-400 resize-none border-0 outline-none text-sm sm:text-base leading-6 py-1 max-h-[120px] min-h-[24px]"
+                className="flex-1 bg-transparent text-white placeholder-zinc-400 resize-none border-0 outline-none focus:outline-none text-base leading-6 py-1 max-h-[120px] min-h-[24px]"
                 rows={1}
               />
 

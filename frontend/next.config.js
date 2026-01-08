@@ -5,6 +5,7 @@ const nextConfig = {
   reactStrictMode: true,
   compress: true,
   poweredByHeader: false,
+  outputFileTracingRoot: __dirname,
   
   // Optimize webpack for better performance
   webpack: (config, { isServer, dev }) => {
@@ -83,12 +84,14 @@ const nextConfig = {
       'framer-motion',
       'react-markdown',
     ],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+
+  // Turbopack configuration
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
@@ -150,7 +153,12 @@ const sentryWebpackPluginOptions = {
   org: "lumora-health",
   project: "lumora-frontend",
   hideSourceMaps: true,
-  disableLogger: true,
+  disableLogger: false,
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true
+    }
+  }
 };
 
 module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);

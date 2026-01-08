@@ -40,15 +40,14 @@ const ReasoningTree: React.FC<ReasoningTreeProps> = ({ steps, onStepClick }) => 
   return (
     <div className="space-y-2">
       {/* Header */}
-      <div className="flex items-center gap-2 px-2 sm:px-3 py-2 bg-gradient-to-r from-white/10 to-blue-500/10 hover:from-white/20 hover:to-blue-500/20 border border-white/30 rounded-lg group transition-all duration-200">
-        <div className="p-1 sm:p-1.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg">
-          <Brain className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+      <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-zinc-900/50 to-zinc-800/50 border border-zinc-700/50 rounded-lg">
+        <div className="p-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg">
+          <Brain className="w-4 h-4 text-white" />
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-xs font-semibold text-white group-hover:text-cyan-300 transition-colors truncate">AI Reasoning Chain</div>
-          <div className="text-xs text-zinc-400">{steps.length} steps</div>
+        <div className="flex-1">
+          <div className="text-sm font-semibold text-white">AI Reasoning Chain</div>
+          <div className="text-xs text-zinc-400">{steps.length} analytical steps</div>
         </div>
-        <div className="text-xs text-zinc-500 bg-zinc-800/50 px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0">Premium</div>
       </div>
 
       {/* Steps */}
@@ -61,28 +60,27 @@ const ReasoningTree: React.FC<ReasoningTreeProps> = ({ steps, onStepClick }) => 
             <div key={step.id} className="group">
               {/* Step Header - Compact */}
               <div
-                className={`flex items-center gap-2 p-1.5 sm:p-2 rounded-lg transition-all duration-200 ${
+                className={`flex items-start gap-3 p-3 rounded-lg transition-all duration-200 ${
                   hasDetails 
-                    ? 'cursor-pointer hover:bg-white/5 border border-white/10 hover:border-white/20' 
-                    : 'bg-zinc-900/30 border border-zinc-700/30'
+                    ? 'cursor-pointer hover:bg-zinc-800/30 border border-zinc-700/50 hover:border-zinc-600/50' 
+                    : 'bg-zinc-900/20 border border-zinc-700/30'
                 }`}
                 onClick={() => hasDetails && toggleStep(step.id)}
               >
-                {/* Compact Avatar */}
-                <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-r ${getConfidenceColor(step.confidence)} flex items-center justify-center text-white flex-shrink-0`}>
-                  <div className="w-3 h-3 sm:w-4 sm:h-4">{getStepIcon(index)}</div>
+                {/* Professional Icon */}
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-800 border border-zinc-600 flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-bold text-white">{index + 1}</span>
                 </div>
 
-                {/* Compact Content */}
+                {/* Full Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="text-xs font-medium text-zinc-400 flex-shrink-0">{index + 1}</span>
-                    <p className="text-[var(--text-primary)] text-xs leading-relaxed flex-1 truncate">{step.thought}</p>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${getConfidenceColor(step.confidence)}`} />
-                      <span className="text-xs text-zinc-500 font-mono">{Math.round(step.confidence * 100)}%</span>
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="text-white text-sm leading-relaxed flex-1">{step.thought}</p>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${getConfidenceColor(step.confidence)}`} />
+                      <span className="text-xs text-zinc-400 font-mono">{Math.round(step.confidence * 100)}%</span>
                       {hasDetails && (
-                        <ChevronRight className={`w-3 h-3 text-zinc-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                        <ChevronRight className={`w-4 h-4 text-zinc-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                       )}
                     </div>
                   </div>

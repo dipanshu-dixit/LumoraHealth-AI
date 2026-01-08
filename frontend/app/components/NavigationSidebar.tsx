@@ -20,7 +20,7 @@ import {
 	Pill,
 	Plus
 } from 'lucide-react';
-import { storage, STORAGE_KEYS, SESSION_KEYS } from '@/lib/storage';
+import { storage, STORAGE_KEYS, SESSION_KEYS } from '../../src/lib/storage';
 import { UserAvatar } from './UserAvatar';
 import { useUser } from '../hooks/useUser';
 
@@ -118,16 +118,16 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 				<div className="group cursor-pointer flex items-center justify-center w-full">
 					{isExpanded ? (
 						<span
-							className="text-3xl font-bold text-white tracking-wide transition-opacity duration-300"
-							style={{ fontFamily: 'Brush Script MT, cursive' }}
+							className="text-3xl font-bold text-white tracking-wide transition-opacity duration-300 min-w-0 lumora-logo"
+							style={{ fontFamily: 'Brush Script MT, cursive', fontSize: 'clamp(1.5rem, 3vw, 1.875rem)' }}
 						>
 							Lumora
 						</span>
 					) : (
 						<div className="flex flex-col items-center justify-center">
 							<span
-								className="text-2xl font-bold text-white transition-opacity duration-300"
-								style={{ fontFamily: 'Brush Script MT, cursive' }}
+								className="text-2xl font-bold text-white transition-opacity duration-300 lumora-logo"
+								style={{ fontFamily: 'Brush Script MT, cursive', fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)' }}
 							>
 								L
 							</span>
@@ -143,10 +143,10 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 					<li>
 						<button
 							onClick={handleNewChat}
-							className="w-full relative flex items-center px-3 py-3 rounded-lg transition-all duration-200 cursor-pointer group text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 border-l-4 border-transparent"
+							className={`relative flex items-center px-3 py-3 rounded-lg transition-all duration-200 cursor-pointer group text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 border-l-4 border-transparent w-full`}
 						>
-							<div className="flex items-center justify-center w-6 h-6 mr-3">
-								<Plus size={20} />
+							<div className={`flex items-center ${isExpanded ? 'justify-start' : 'justify-center'} w-6 h-6 ${isExpanded ? 'mr-3' : ''} flex-shrink-0`}>
+								<Plus size={20} className="flex-shrink-0" />
 							</div>
 							{isExpanded ? (
 								<span className="font-medium text-sm opacity-100 transition-opacity duration-300">New Chat</span>
@@ -171,7 +171,7 @@ const NavigationSidebar = React.memo<NavigationSidebarProps>(({ user }) => {
 												: 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 border-l-4 border-transparent'
 										}`}
 									>
-										<div className="flex items-center justify-center w-6 h-6 mr-3">
+										<div className={`flex items-center ${isExpanded ? 'justify-start' : 'justify-center'} w-6 h-6 ${isExpanded ? 'mr-3' : ''}`}>
 											<Icon size={20} className={`${active ? 'text-white drop-shadow-sm' : ''}`} />
 										</div>
                     
