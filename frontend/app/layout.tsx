@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Lora } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.optimized.css'
 import MobileDrawer from './components/MobileDrawer'
 import UniversalHeader from './components/UniversalHeader'
@@ -81,6 +82,7 @@ export default function RootLayout({
           </div>
           <MobileDrawer />
         </GlobalErrorBoundary>
+        <Analytics />
       </body>
     </html>
   )
