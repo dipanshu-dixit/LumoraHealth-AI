@@ -1,7 +1,7 @@
 # Lumora AI Health Assistant
 
 <div align="center">
-  <h3>✨ Privacy-First AI Health Intelligence Platform ✨</h3>
+  <h3>✨ Privacy-First AI Health Intelligence Platform </h3>
   <p>Your personal health companion powered by xAI Grok-4</p>
 </div>
 
@@ -234,8 +234,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📊 Project Stats
 
-- **Version**: 1.1
-- **AI Model**: xAI Grok-4 Latest
+- **Version**: 0.9 (Beta Version)
+- **AI Model**: xAI Grok-4 fast-reasoning Latest
 - **License**: MIT
 - **Status**: Production Ready ✅
 
@@ -243,7 +243,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 💖 Acknowledgments
 
-- xAI for Grok-4 API
+- Thanks to xAI for Grok-4 API
 - Next.js team for the amazing framework
 - Open source community
 
