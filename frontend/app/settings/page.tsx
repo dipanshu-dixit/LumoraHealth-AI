@@ -307,7 +307,7 @@ export default function Settings() {
 						<div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:bg-zinc-800/80 transition-all relative">
 							<h2 className="text-xl font-bold text-white mb-4 font-sans">About Lumora</h2>
 							<p className="text-zinc-400 font-sans text-sm leading-relaxed">
-								Lumora AI v1.1 • Powered by xAI Grok-4
+								Lumora AI v0.9 (Beta Version) • Powered by xAI Grok-4 Latest
 							</p>
 							<div className="mt-4 pt-4 border-t border-zinc-800">
 								<p className="text-zinc-500 text-xs font-sans mb-2">
