@@ -244,7 +244,7 @@ export default function History() {
                                 e.stopPropagation();
                                 handleTogglePin(chat.id);
                               }}
-                              className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
+                              className={`p-1.5 sm:p-2 rounded-lg transition-colors flex items-center justify-center ${
                                 chat.pinned
                                   ? 'bg-yellow-500/20 text-yellow-400'
                                   : 'text-zinc-500 hover:text-yellow-400 hover:bg-yellow-500/10'
@@ -258,7 +258,7 @@ export default function History() {
                                 setEditingId(chat.id);
                                 setEditTitle(chat.topic);
                               }}
-                              className="p-1.5 sm:p-2 text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                              className="p-1.5 sm:p-2 text-zinc-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors flex items-center justify-center"
                             >
                               <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             </button>
@@ -267,7 +267,7 @@ export default function History() {
                                 e.stopPropagation();
                                 handleRateChat(chat.id, 'up');
                               }}
-                              className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
+                              className={`p-1.5 sm:p-2 rounded-lg transition-colors flex items-center justify-center ${
                                 chat.rating === 'up' 
                                   ? 'bg-green-500/20 text-green-400' 
                                   : 'text-zinc-500 hover:text-green-400 hover:bg-green-500/10'
@@ -280,7 +280,7 @@ export default function History() {
                                 e.stopPropagation();
                                 handleRateChat(chat.id, 'down');
                               }}
-                              className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
+                              className={`p-1.5 sm:p-2 rounded-lg transition-colors flex items-center justify-center ${
                                 chat.rating === 'down' 
                                   ? 'bg-red-500/20 text-red-400' 
                                   : 'text-zinc-500 hover:text-red-400 hover:bg-red-500/10'
@@ -293,7 +293,7 @@ export default function History() {
                                 e.stopPropagation();
                                 handleDeleteChat(chat.id);
                               }}
-                              className="p-1.5 sm:p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                              className="p-1.5 sm:p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors flex items-center justify-center"
                             >
                               <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             </button>
