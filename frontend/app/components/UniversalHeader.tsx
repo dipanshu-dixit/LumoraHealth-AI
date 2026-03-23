@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { ArrowLeft, Shield } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
-import StatusHeader from './StatusHeader';
-import { storage, SESSION_KEYS, STORAGE_KEYS } from '../../src/lib/storage';
+import { storage, STORAGE_KEYS } from '../../src/lib/storage';
 import { useUser } from '../hooks/useUser';
 
 interface UniversalHeaderProps {
