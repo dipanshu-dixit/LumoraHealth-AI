@@ -9,6 +9,8 @@ import { performanceMonitoring, getMetricsSummary } from './middleware/performan
 const app = express();
 const PORT = 5000;
 
+app.set('trust proxy', 1);
+
 // Security first
 app.use(httpsEnforcement);
 app.use(securityHeaders);
@@ -22,7 +24,7 @@ const rateLimit = ({ windowMs = 60 * 1000, max = 60 } = {}) => {
 
   return (req, res, next) => {
     try {
-      const key = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+      const key = req.ip || 'unknown';
       const now = Date.now();
       const entry = hits.get(key) || { count: 0, reset: now + windowMs };
 

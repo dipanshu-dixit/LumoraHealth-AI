@@ -3,7 +3,7 @@ import helmet from 'helmet';
 // HTTPS enforcement (proxy-aware)
 export const httpsEnforcement = (req, res, next) => {
   if (process.env.NODE_ENV === 'production') {
-    const proto = req.headers['x-forwarded-proto'] || req.protocol;
+    const proto = req.protocol;
     if (proto !== 'https') {
       return res.redirect(301, `https://${req.get('host')}${req.originalUrl}`);
     }
