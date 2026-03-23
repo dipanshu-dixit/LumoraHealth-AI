@@ -1,3 +1,5 @@
+import { logger } from './logger';
+
 class SessionManager {
   private static instance: SessionManager;
 
@@ -12,9 +14,8 @@ class SessionManager {
     try {
       localStorage.setItem('lumora_active_chat_id', chatId);
       localStorage.setItem('lumora_from_history', 'true');
-      console.log('Set active chat:', chatId);
     } catch (error) {
-      console.error('Failed to set active chat:', error);
+      logger.error('Failed to set active chat:', { error });
     }
   }
 
@@ -22,10 +23,9 @@ class SessionManager {
     try {
       const chatId = localStorage.getItem('lumora_active_chat_id');
       const fromHistory = localStorage.getItem('lumora_from_history') === 'true';
-      console.log('Get active chat:', chatId, fromHistory);
       return { chatId, fromHistory };
     } catch (error) {
-      console.error('Failed to get active chat:', error);
+      logger.error('Failed to get active chat:', { error });
       return { chatId: null, fromHistory: false };
     }
   }
@@ -33,9 +33,8 @@ class SessionManager {
   clearActiveChat(): void {
     try {
       localStorage.removeItem('lumora_from_history');
-      console.log('Cleared active chat');
     } catch (error) {
-      console.error('Failed to clear active chat:', error);
+      logger.error('Failed to clear active chat:', { error });
     }
   }
 
@@ -47,7 +46,7 @@ class SessionManager {
         localStorage.removeItem('lumora_active_chat_id');
       }
     } catch (error) {
-      console.error('Failed to set current session:', error);
+      logger.error('Failed to set current session:', { error });
     }
   }
 
@@ -55,7 +54,7 @@ class SessionManager {
     try {
       return localStorage.getItem('lumora_active_chat_id');
     } catch (error) {
-      console.error('Failed to get current session:', error);
+      logger.error('Failed to get current session:', { error });
       return null;
     }
   }
@@ -64,7 +63,7 @@ class SessionManager {
     try {
       sessionStorage.clear();
     } catch (error) {
-      console.error('Failed to clear session storage:', error);
+      logger.error('Failed to clear session storage:', { error });
     }
   }
 }
