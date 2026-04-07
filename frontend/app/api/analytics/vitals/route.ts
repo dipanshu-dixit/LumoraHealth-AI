@@ -36,15 +36,3 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
-  const summary = {
-    total: metrics.length,
-    byName: metrics.reduce((acc: Record<string, number>, m) => {
-      acc[m.name] = (acc[m.name] || 0) + 1;
-      return acc;
-    }, {}),
-    recent: metrics.slice(-10)
-  };
-
-  return NextResponse.json(summary);
-}
