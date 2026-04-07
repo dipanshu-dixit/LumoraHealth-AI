@@ -92,23 +92,30 @@ class HealthTimelineService {
     const symptomKeywords = ['pain', 'headache', 'fever', 'cough', 'fatigue', 'nausea', 'dizzy', 'ache'];
     const medicationKeywords = ['taking', 'prescribed', 'medication', 'pill', 'tablet', 'dose'];
 
+    const symptomRegex = new RegExp(`(${symptomKeywords.join('|')})`);
+    const medicationRegex = new RegExp(`(${medicationKeywords.join('|')})`, 'i');
+    const medNameRegex = /\b[A-Z][a-z]+(?:in|ol|ex|am)\b/;
+
     chats.forEach(chat => {
       chat.messages.forEach(msg => {
         if (!msg.isUser) return;
-        const content = msg.content.toLowerCase();
 
-        symptomKeywords.forEach(symptom => {
-          if (content.includes(symptom)) {
-            if (!symptoms.has(symptom)) {
-              symptoms.set(symptom, { dates: [], severity: [] });
+        const contentLower = msg.content.toLowerCase();
+
+        if (symptomRegex.test(contentLower)) {
+          symptomKeywords.forEach(symptom => {
+            if (contentLower.includes(symptom)) {
+              if (!symptoms.has(symptom)) {
+                symptoms.set(symptom, { dates: [], severity: [] });
+              }
+              symptoms.get(symptom)!.dates.push(msg.timestamp);
+              symptoms.get(symptom)!.severity.push(this.estimateSeverity(contentLower));
             }
-            symptoms.get(symptom)!.dates.push(msg.timestamp);
-            symptoms.get(symptom)!.severity.push(this.estimateSeverity(content));
-          }
-        });
+          });
+        }
 
-        if (medicationKeywords.some(kw => content.includes(kw))) {
-          const medMatch = content.match(/\b[A-Z][a-z]+(?:in|ol|ex|am)\b/);
+        if (medicationRegex.test(contentLower)) {
+          const medMatch = msg.content.match(medNameRegex);
           if (medMatch) {
             const medName = medMatch[0];
             if (!medications.has(medName)) {
