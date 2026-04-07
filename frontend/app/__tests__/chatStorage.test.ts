@@ -13,10 +13,20 @@ const localStorageMock = (() => {
 })();
 
 global.localStorage = localStorageMock;
+global.window = {
+  setTimeout: setTimeout,
+  clearTimeout: clearTimeout,
+  crypto: require('crypto').webcrypto
+} as any;
+
+global.crypto = require('crypto').webcrypto;
 
 describe('ChatStorage', () => {
   beforeEach(() => {
     localStorage.clear();
+    if ('memoryCache' in ChatStorage) {
+      (ChatStorage as any).memoryCache = null;
+    }
   });
 
   describe('generateTitle', () => {
@@ -68,8 +78,8 @@ describe('ChatStorage', () => {
     });
 
     test('returns all saved chats', () => {
-      ChatStorage.saveChat('Topic 1', []);
-      ChatStorage.saveChat('Topic 2', []);
+      ChatStorage.saveChat('Topic 1', [{ id: '1', content: 'test', isUser: true, timestamp: new Date() }]);
+      ChatStorage.saveChat('Topic 2', [{ id: '1', content: 'test', isUser: true, timestamp: new Date() }]);
       
       const chats = ChatStorage.getAllChats();
       expect(chats).toHaveLength(2);
@@ -117,7 +127,7 @@ describe('ChatStorage', () => {
 
   describe('togglePin', () => {
     test('pins and unpins chat', () => {
-      const chatId = ChatStorage.saveChat('Test', []);
+      const chatId = ChatStorage.saveChat('Test', [{ id: '1', content: 'test', isUser: true, timestamp: new Date() }]);
       
       ChatStorage.togglePin(chatId);
       let chats = ChatStorage.getAllChats();
@@ -131,7 +141,7 @@ describe('ChatStorage', () => {
 
   describe('rateChat', () => {
     test('rates chat up or down', () => {
-      const chatId = ChatStorage.saveChat('Test', []);
+      const chatId = ChatStorage.saveChat('Test', [{ id: '1', content: 'test', isUser: true, timestamp: new Date() }]);
       
       ChatStorage.rateChat(chatId, 'up');
       let chats = ChatStorage.getAllChats();
