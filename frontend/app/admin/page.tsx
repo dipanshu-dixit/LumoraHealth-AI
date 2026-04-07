@@ -17,12 +17,27 @@ export default function AdminPanel() {
     }
   }, []);
 
-  const authenticate = () => {
-    if (adminPassword === 'lumora2024') {
-      setIsAuthenticated(true);
-      toast.success('Admin access granted');
-    } else {
-      toast.error('Invalid password');
+  const authenticate = async () => {
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password: adminPassword }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsAuthenticated(true);
+        toast.success(data.message || 'Admin access granted');
+      } else {
+        toast.error(data.error || 'Invalid password');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('An error occurred during authentication');
     }
   };
 
