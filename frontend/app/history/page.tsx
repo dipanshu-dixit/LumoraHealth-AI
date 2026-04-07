@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageCircle, Calendar, Trash2, ThumbsUp, ThumbsDown, Plus, Pin, Edit2, Check, X } from 'lucide-react';
+import { MessageCircle, Trash2, ThumbsUp, ThumbsDown, Plus, Pin, Edit2, Check, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { ChatStorage, type ChatSession } from '../lib/chatStorage';
