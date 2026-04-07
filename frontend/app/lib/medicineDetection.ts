@@ -31,6 +31,14 @@ const COMMON_MEDICINES = [
   'glucosamine', 'chondroitin', 'turmeric', 'curcumin', 'probiotics'
 ];
 
+// Pre-calculate formatted names and regexes for common medicines to optimize detection
+const MEDICINE_DATA = COMMON_MEDICINES.map(medicine => ({
+  formatted: medicine.split(' ').map(word =>
+    word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(' '),
+  regex: new RegExp(`\\b${medicine.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+}));
+
 // Medicine-related keywords to detect context
 const MEDICINE_KEYWORDS = [
   'tablet', 'capsule', 'pill', 'medication', 'medicine', 'drug',
@@ -48,6 +56,12 @@ const BLACKLIST = [
   'school', 'cool', 'pool', 'tool', 'fool', 'wool', 'stool'
 ];
 
+// Optimization: Convert blacklist to a Set for O(1) lookups
+const BLACKLIST_SET = new Set(BLACKLIST.map(word => word.toLowerCase()));
+
+// Optimization: Pre-compile smart detection regex
+const SMART_DETECTION_REGEX = /\b[A-Z][a-z]{4,}(?:pril|statin|mycin|cillin|oxin|azole|mab|tinib|afil|dipine|sartan|olol|zole|pine|done|tide)\b/g;
+
 export const detectMedicines = (text: string): string[] => {
   const lowerText = text.toLowerCase();
   const detected = new Set<string>();
@@ -59,24 +73,20 @@ export const detectMedicines = (text: string): string[] => {
     return [];
   }
 
-  // Detect from known medicine list
-  COMMON_MEDICINES.forEach(medicine => {
-    const regex = new RegExp(`\\b${medicine}\\b`, 'gi');
-    if (regex.test(lowerText)) {
-      const formatted = medicine.split(' ').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' ');
-      detected.add(formatted);
+  // Detect from known medicine list using pre-compiled regexes
+  MEDICINE_DATA.forEach(med => {
+    if (med.regex.test(lowerText)) {
+      detected.add(med.formatted);
     }
   });
   
   // Smart detection: capitalized words with medicine suffixes
-  const words = text.match(/\b[A-Z][a-z]{4,}(?:pril|statin|mycin|cillin|oxin|azole|mab|tinib|afil|dipine|sartan|olol|zole|pine|done|tide)\b/g);
+  const words = text.match(SMART_DETECTION_REGEX);
   if (words) {
     words.forEach(word => {
       const lower = word.toLowerCase();
       // Only add if not in blacklist, not already detected, and has medicine context nearby
-      if (!BLACKLIST.includes(lower) && !detected.has(word) && word.length >= 6) {
+      if (!BLACKLIST_SET.has(lower) && !detected.has(word) && word.length >= 6) {
         // Check if word appears near medicine context
         const wordIndex = lowerText.indexOf(lower);
         const contextWindow = lowerText.substring(Math.max(0, wordIndex - 50), wordIndex + word.length + 50);
