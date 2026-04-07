@@ -92,24 +92,21 @@ export const detectMedicines = (text: string): string[] => {
   return Array.from(detected);
 };
 
-export const checkInteractions = (medicines: string[]): boolean => {
-  // Known dangerous interactions
-  const interactions = [
-    ['warfarin', 'aspirin'],
-    ['warfarin', 'ibuprofen'],
-    ['metformin', 'alcohol'],
-    ['alprazolam', 'alcohol'],
-    ['tramadol', 'sertraline']
-  ];
+// Known dangerous interactions
+const DANGEROUS_INTERACTIONS = [
+  ['warfarin', 'aspirin'],
+  ['warfarin', 'ibuprofen'],
+  ['metformin', 'alcohol'],
+  ['alprazolam', 'alcohol'],
+  ['tramadol', 'sertraline']
+];
 
-  for (let i = 0; i < medicines.length; i++) {
-    for (let j = i + 1; j < medicines.length; j++) {
-      const pair = [medicines[i].toLowerCase(), medicines[j].toLowerCase()].sort();
-      const hasInteraction = interactions.some(([a, b]) => 
-        (pair[0] === a && pair[1] === b) || (pair[0] === b && pair[1] === a)
-      );
-      if (hasInteraction) return true;
-    }
-  }
-  return false;
+export const checkInteractions = (medicines: string[]): boolean => {
+  if (medicines.length < 2) return false;
+
+  const medicineSet = new Set(medicines.map(m => m.toLowerCase()));
+
+  return DANGEROUS_INTERACTIONS.some(([a, b]) =>
+    medicineSet.has(a) && medicineSet.has(b)
+  );
 };
