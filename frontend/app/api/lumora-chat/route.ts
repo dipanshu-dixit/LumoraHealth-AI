@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { logger } from '../../lib/logger';
 
 // Inline validation schemas
 const chatMessageSchema = z.object({
@@ -32,34 +33,6 @@ const validateInput = <T>(schema: z.ZodSchema<T>, data: unknown) => {
     throw new Error(`Validation failed: ${errors}`);
   }
   return result.data;
-};
-
-// Inline logger for API routes
-const logger = {
-  error: (message: string, meta: Record<string, any> = {}) => {
-    console.error(JSON.stringify({
-      level: 'error',
-      message,
-      timestamp: new Date().toISOString(),
-      ...meta
-    }));
-  },
-  warn: (message: string, meta: Record<string, any> = {}) => {
-    console.warn(JSON.stringify({
-      level: 'warn', 
-      message,
-      timestamp: new Date().toISOString(),
-      ...meta
-    }));
-  },
-  info: (message: string, meta: Record<string, any> = {}) => {
-    console.log(JSON.stringify({
-      level: 'info',
-      message, 
-      timestamp: new Date().toISOString(),
-      ...meta
-    }));
-  }
 };
 
 export const dynamic = 'force-dynamic';
