@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { sanitizeApiError } from '../../../src/lib/errorUtils';
 
 // Inline validation schemas
 const chatMessageSchema = z.object({
@@ -163,7 +164,7 @@ ${validatedData.adaptiveProfile.topicsOfInterest.length > 0 ? `- Topics of inter
       logger.error('xAI API error', { 
         requestId,
         status: response.status,
-        error: errorText 
+        error: sanitizeApiError(errorText)
       });
       
       if (response.status === 429) {

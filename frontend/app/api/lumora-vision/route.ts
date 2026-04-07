@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { sanitizeApiError } from '../../../src/lib/errorUtils';
 
 const visionSchema = z.object({
   image: z.string().min(1, 'Image data required'),
@@ -77,7 +78,7 @@ Be concise and focused. Format response clearly with sections and bullet points.
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error('xAI Vision API error', { requestId, status: response.status, error: errorText });
+      logger.error('xAI Vision API error', { requestId, status: response.status, error: sanitizeApiError(errorText) });
       return NextResponse.json({ error: "Vision analysis unavailable" }, { status: 503 });
     }
 

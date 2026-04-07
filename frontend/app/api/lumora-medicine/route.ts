@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { sanitizeApiError } from '../../../src/lib/errorUtils';
 
 // Inline validation schemas
 const medicineSearchSchema = z.object({
@@ -108,7 +109,7 @@ Use simple, universal language that anyone can understand. Avoid medical jargon.
       logger.error('XAI API error in medicine search', { 
         requestId,
         status: response.status,
-        error: errorText 
+        error: sanitizeApiError(errorText)
       });
       
       if (response.status === 429) {
