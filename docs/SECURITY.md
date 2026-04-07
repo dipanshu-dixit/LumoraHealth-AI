@@ -41,6 +41,15 @@ Lumora takes security seriously. This document outlines our security measures, r
 const rateLimit = ({ windowMs = 60 * 1000, max = 60 } = {}) => {
   const hits = new Map();
   
+  // Periodic cleanup of expired entries (Security Fix)
+  const interval = setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of hits) {
+      if (now > entry.reset) hits.delete(key);
+    }
+  }, windowMs);
+  if (interval.unref) interval.unref();
+
   return (req, res, next) => {
     const key = req.ip || 'unknown';
     const now = Date.now();
