@@ -4,6 +4,16 @@ import { randomBytes, timingSafeEqual } from 'crypto';
 // Rate limiting store (in production, use Redis)
 const rateLimit = new Map<string, { count: number; resetTime: number }>();
 
+// Periodic cleanup of expired rate limit entries to prevent memory leaks (Security Fix)
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimit) {
+    if (now > entry.resetTime) {
+      rateLimit.delete(ip);
+    }
+  }
+}, 15 * 60 * 1000); // Clean up every 15 minutes (matching windowMs)
+
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   

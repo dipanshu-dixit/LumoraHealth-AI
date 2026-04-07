@@ -22,6 +22,19 @@ app.use(performanceMonitoring);
 const rateLimit = ({ windowMs = 60 * 1000, max = 60 } = {}) => {
   const hits = new Map();
 
+  // Periodic cleanup of expired entries to prevent memory leaks (Security Fix)
+  const interval = setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of hits) {
+      if (now > entry.reset) {
+        hits.delete(key);
+      }
+    }
+  }, windowMs);
+
+  // Don't let this interval keep the process alive
+  if (interval.unref) interval.unref();
+
   return (req, res, next) => {
     try {
       const key = req.ip || 'unknown';

@@ -199,8 +199,17 @@ const validateCSRF = (req, res, next) => {
 const rateLimit = ({ windowMs = 60 * 1000, max = 60 } = {}) => {
   const hits = new Map();
 
+  // Periodic cleanup of expired entries (Security Fix)
+  const interval = setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of hits) {
+      if (now > entry.reset) hits.delete(key);
+    }
+  }, windowMs);
+  if (interval.unref) interval.unref();
+
   return (req, res, next) => {
-    const key = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+    const key = req.ip || 'unknown';
     const now = Date.now();
     const entry = hits.get(key) || { count: 0, reset: now + windowMs };
 
