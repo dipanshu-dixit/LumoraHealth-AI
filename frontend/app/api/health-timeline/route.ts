@@ -24,7 +24,16 @@ export async function POST(req: NextRequest) {
         model: 'grok-4-1-fast-reasoning',
         messages: [{
           role: 'system',
-          content: 'Extract health data from conversations. Return only valid JSON. For insights, provide ACTIONABLE self-care recommendations (hydration, sleep, exercise, stress management, diet changes) instead of saying "consult a doctor". Only suggest medical consultation if symptoms are severe or dangerous. Format: {"symptoms": [{"name": "string", "dates": ["ISO date"], "severity": [1-10]}], "medications": [{"name": "string", "startDate": "ISO date", "frequency": "string"}], "lifestyle": {"sleep": [], "exercise": [], "stress": []}, "insights": [{"pattern": "string", "recommendation": "actionable self-care advice", "confidence": 0-1, "category": "symptom"}]}'
+          content: `Extract health data from conversations. Return only valid JSON.
+For insights, provide ACTIONABLE self-care recommendations (hydration, sleep, exercise, stress management, diet changes) instead of saying "consult a doctor".
+Only suggest medical consultation if symptoms are severe or dangerous.
+
+Format: {
+  "symptoms": [{"name": "string", "dates": ["ISO date"], "severity": [1-10]}],
+  "medications": [{"name": "string", "startDate": "ISO date", "frequency": "string"}],
+  "lifestyle": {"sleep": [], "exercise": [], "stress": []},
+  "insights": [{"pattern": "string", "recommendation": "actionable self-care advice", "confidence": 0-1, "category": "symptom"}]
+}`
         }, {
           role: 'user',
           content: conversationText.substring(0, 8000)
