@@ -1,22 +1,33 @@
 import { ChatStorage } from '../lib/chatStorage';
-import { randomUUID } from 'crypto';
 
-// Use real localStorage implementation
-const localStorageMock = (() => {
-  let store = {};
-  return {
-    getItem: (key) => store[key] || null,
-    setItem: (key, value) => { store[key] = value.toString(); },
-    removeItem: (key) => { delete store[key]; },
-    clear: () => { store = {}; }
-  };
-})();
+// Mock storage module
+const mockStore: Record<string, string> = {};
 
-global.localStorage = localStorageMock;
+jest.mock('../../src/lib/storage', () => ({
+  STORAGE_KEYS: {
+    CHAT_HISTORY: 'lumora-chat-history'
+  },
+  storage: {
+    get: jest.fn((key: string) => mockStore[key] || null),
+    set: jest.fn((key: string, value: string) => { mockStore[key] = value; }),
+    remove: jest.fn((key: string) => { delete mockStore[key]; }),
+    clear: jest.fn(() => {
+      Object.keys(mockStore).forEach(key => delete mockStore[key]);
+    })
+  }
+}));
+
+import { storage } from '../../src/lib/storage';
 
 describe('ChatStorage', () => {
   beforeEach(() => {
-    localStorage.clear();
+    jest.useFakeTimers();
+    Object.keys(mockStore).forEach(key => delete mockStore[key]);
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('generateTitle', () => {
@@ -43,6 +54,8 @@ describe('ChatStorage', () => {
       ];
       const chatId = ChatStorage.saveChat('Test Topic', messages);
       
+      jest.runAllTimers(); // Advance timers for debounced save
+
       expect(chatId).toBeTruthy();
       expect(typeof chatId).toBe('string');
       const chats = ChatStorage.getAllChats();
@@ -56,6 +69,8 @@ describe('ChatStorage', () => {
       ];
       ChatStorage.saveChat('Health Consultation', messages);
       
+      jest.runAllTimers(); // Advance timers for debounced save
+
       const chats = ChatStorage.getAllChats();
       expect(chats[0].topic).not.toBe('Health Consultation');
     });
@@ -68,8 +83,16 @@ describe('ChatStorage', () => {
     });
 
     test('returns all saved chats', () => {
-      ChatStorage.saveChat('Topic 1', []);
-      ChatStorage.saveChat('Topic 2', []);
+      // saveChat returns early if messages are empty and not previously saved, but with a new random uuid
+      // Wait, we need to pass a non-empty messages array for it to actually save new chats
+      const messages1 = [{ id: '1', content: 'hello', isUser: true, timestamp: new Date() }];
+      const messages2 = [{ id: '2', content: 'hello', isUser: true, timestamp: new Date() }];
+      // We must pass different message ids to ensure different random generated chat ids
+      ChatStorage.saveChat('Topic 1', messages1);
+      jest.runAllTimers();
+      ChatStorage.saveChat('Topic 2', messages2);
+
+      jest.runAllTimers(); // Advance timers for debounced save
       
       const chats = ChatStorage.getAllChats();
       expect(chats).toHaveLength(2);
@@ -78,7 +101,9 @@ describe('ChatStorage', () => {
 
   describe('deleteChat', () => {
     test('removes chat by id', () => {
-      const chatId = ChatStorage.saveChat('Test', []);
+      const messages = [{ id: '1', content: 'hello', isUser: true, timestamp: new Date() }];
+      const chatId = ChatStorage.saveChat('Test', messages);
+      jest.runAllTimers();
       ChatStorage.deleteChat(chatId);
       
       const chats = ChatStorage.getAllChats();
@@ -88,8 +113,10 @@ describe('ChatStorage', () => {
 
   describe('clearAllChats', () => {
     test('removes all chats', () => {
-      ChatStorage.saveChat('Test 1', []);
-      ChatStorage.saveChat('Test 2', []);
+      const messages = [{ id: '1', content: 'hello', isUser: true, timestamp: new Date() }];
+      ChatStorage.saveChat('Test 1', messages);
+      ChatStorage.saveChat('Test 2', messages);
+      jest.runAllTimers();
       ChatStorage.clearAllChats();
       
       const chats = ChatStorage.getAllChats();
@@ -117,7 +144,9 @@ describe('ChatStorage', () => {
 
   describe('togglePin', () => {
     test('pins and unpins chat', () => {
-      const chatId = ChatStorage.saveChat('Test', []);
+      const messages = [{ id: '1', content: 'hello', isUser: true, timestamp: new Date() }];
+      const chatId = ChatStorage.saveChat('Test', messages);
+      jest.runAllTimers();
       
       ChatStorage.togglePin(chatId);
       let chats = ChatStorage.getAllChats();
@@ -131,7 +160,9 @@ describe('ChatStorage', () => {
 
   describe('rateChat', () => {
     test('rates chat up or down', () => {
-      const chatId = ChatStorage.saveChat('Test', []);
+      const messages = [{ id: '1', content: 'hello', isUser: true, timestamp: new Date() }];
+      const chatId = ChatStorage.saveChat('Test', messages);
+      jest.runAllTimers();
       
       ChatStorage.rateChat(chatId, 'up');
       let chats = ChatStorage.getAllChats();
