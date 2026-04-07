@@ -43,9 +43,6 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({
     }
   };
 
-  // Don't show on home page
-  // if (pathname === '/') return null;
-
   // Get page title if not provided
   const getPageTitle = () => {
     if (title) return title;
