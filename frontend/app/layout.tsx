@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Lora } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import './globals.optimized.css'
+import './globals.css'
 import MobileDrawer from './components/MobileDrawer'
 import UniversalHeader from './components/UniversalHeader'
 import { GlobalErrorBoundary } from './components/GlobalErrorBoundary'
