@@ -1,14 +1,43 @@
 import CryptoJS from 'crypto-js';
 
+const STORAGE_KEY = 'lumora-secure-storage-key';
+let inMemoryFallbackKey: string | null = null;
+
 const getSecretKey = () => {
   if (typeof window === 'undefined') {
-    throw new Error('Encryption not available during build time');
+    // Return a placeholder for SSR/build time
+    return 'ssr-placeholder-key';
   }
-  const key = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
-  if (!key || key === 'default-dev-key-do-not-use-in-prod') {
-    throw new Error('NEXT_PUBLIC_ENCRYPTION_KEY must be set in environment variables');
+
+  try {
+    let key = localStorage.getItem(STORAGE_KEY);
+
+    if (!key) {
+      // Generate a cryptographically strong random 256-bit key
+      // This ensures each device has its own unique key and it's not in the source code
+      const array = new Uint8Array(32);
+      window.crypto.getRandomValues(array);
+      key = Array.from(array)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+
+      localStorage.setItem(STORAGE_KEY, key);
+    }
+
+    return key;
+  } catch (error) {
+    // Fallback for environments where localStorage might be restricted (e.g. private browsing)
+    // We use a per-session in-memory random key instead of a hardcoded one
+    if (!inMemoryFallbackKey) {
+      const array = new Uint8Array(32);
+      window.crypto.getRandomValues(array);
+      inMemoryFallbackKey = Array.from(array)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+    console.error('Encryption key storage failed, using session-only key:', error);
+    return inMemoryFallbackKey;
   }
-  return key;
 };
 
 export const secureStorage = {
