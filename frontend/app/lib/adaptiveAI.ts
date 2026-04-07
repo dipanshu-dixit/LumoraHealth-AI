@@ -16,6 +16,7 @@ class AdaptiveAIService {
   private static instance: AdaptiveAIService;
   private readonly PROFILE_KEY = 'lumora-ai-profile';
   private readonly FEEDBACK_KEY = 'lumora-message-feedback';
+  private cachedFeedback: MessageFeedback[] | null = null;
 
   static getInstance(): AdaptiveAIService {
     if (!AdaptiveAIService.instance) {
@@ -33,10 +34,11 @@ class AdaptiveAIService {
     };
 
     const existing = this.getAllFeedback();
-    existing.push(feedback);
+    const updated = [...existing, feedback];
     
     // Keep last 100 feedbacks
-    const limited = existing.slice(-100);
+    const limited = updated.slice(-100);
+    this.cachedFeedback = limited;
     localStorage.setItem(this.FEEDBACK_KEY, JSON.stringify(limited));
     
     // Rebuild profile
@@ -44,14 +46,23 @@ class AdaptiveAIService {
   }
 
   private getAllFeedback(): MessageFeedback[] {
+    if (this.cachedFeedback) {
+      return this.cachedFeedback;
+    }
+
     try {
       const stored = localStorage.getItem(this.FEEDBACK_KEY);
-      if (!stored) return [];
-      return JSON.parse(stored).map((f: any) => ({
+      if (!stored) {
+        this.cachedFeedback = [];
+        return [];
+      }
+      this.cachedFeedback = JSON.parse(stored).map((f: any) => ({
         ...f,
         timestamp: new Date(f.timestamp)
       }));
+      return this.cachedFeedback || [];
     } catch {
+      this.cachedFeedback = [];
       return [];
     }
   }
