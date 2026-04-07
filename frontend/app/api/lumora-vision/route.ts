@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { logger } from '../../lib/logger';
 
 const visionSchema = z.object({
   image: z.string().min(1, 'Image data required'),
@@ -10,11 +11,6 @@ const visionSchema = z.object({
   })).optional().default([]),
   userMessage: z.string().optional().default('')
 });
-
-const logger = {
-  error: (msg: string, meta: any = {}) => console.error(JSON.stringify({ level: 'error', msg, ...meta })),
-  info: (msg: string, meta: any = {}) => console.log(JSON.stringify({ level: 'info', msg, ...meta }))
-};
 
 export const dynamic = 'force-dynamic';
 
