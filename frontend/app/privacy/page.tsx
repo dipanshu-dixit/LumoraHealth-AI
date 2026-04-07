@@ -80,7 +80,7 @@ export default function Privacy() {
         ${chat.messages.map((msg: any) => `
           <div class="message ${msg.isUser ? 'user-msg' : 'ai-msg'}">
             <div class="label">${msg.isUser ? 'You' : 'Lumora AI'}</div>
-            <div>${msg.content.replace(/\*\*/g, '').replace(/\*/g, '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</div>
+            <div>${escapeHtml(msg.content.replace(/\*\*/g, '').replace(/\*/g, '')).replace(/\n/g, '<br>')}</div>
           </div>
         `).join('')}
       </div>
