@@ -33,9 +33,18 @@ class MedicineHistoryService {
     try {
       const saved = storage.get(STORAGE_KEYS.MEDICINE_HISTORY);
       const items = saved || [];
-      const unique = items.filter((item: MedicineHistoryItem, index: number, self: MedicineHistoryItem[]) => 
-        index === self.findIndex(t => t.medicine.toLowerCase().trim() === item.medicine.toLowerCase().trim())
-      );
+
+      const seen = new Set<string>();
+      const unique: MedicineHistoryItem[] = [];
+
+      for (const item of items) {
+        const normalized = item.medicine.toLowerCase().trim();
+        if (!seen.has(normalized)) {
+          seen.add(normalized);
+          unique.push(item);
+        }
+      }
+
       this.currentHistory = unique.slice(0, 10);
       return this.currentHistory;
     } catch (error) {
