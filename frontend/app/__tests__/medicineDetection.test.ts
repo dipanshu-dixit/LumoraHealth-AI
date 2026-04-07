@@ -1,4 +1,4 @@
-import { detectMedicines } from '../lib/medicineDetection';
+import { detectMedicines, checkInteractions } from '../lib/medicineDetection';
 import { performance } from 'perf_hooks';
 
 const sampleText = `
@@ -46,5 +46,39 @@ describe('medicineDetection performance', () => {
     console.log(`Average time per call: ${averageTime.toFixed(4)}ms`);
 
     expect(averageTime).toBeLessThan(10); // Loose constraint
+  });
+});
+
+describe('checkInteractions', () => {
+  it('should detect known dangerous interactions', () => {
+    expect(checkInteractions(['warfarin', 'aspirin'])).toBe(true);
+    expect(checkInteractions(['warfarin', 'ibuprofen'])).toBe(true);
+    expect(checkInteractions(['metformin', 'alcohol'])).toBe(true);
+    expect(checkInteractions(['alprazolam', 'alcohol'])).toBe(true);
+    expect(checkInteractions(['tramadol', 'sertraline'])).toBe(true);
+  });
+
+  it('should be case-insensitive', () => {
+    expect(checkInteractions(['Warfarin', 'ASPIRIN'])).toBe(true);
+    expect(checkInteractions(['Metformin', 'ALCOHOL'])).toBe(true);
+  });
+
+  it('should not detect interactions for safe combinations', () => {
+    expect(checkInteractions(['paracetamol', 'ibuprofen'])).toBe(false);
+    expect(checkInteractions(['amoxicillin', 'omeprazole'])).toBe(false);
+    expect(checkInteractions(['warfarin', 'metformin'])).toBe(false);
+  });
+
+  it('should handle empty or single medicine lists', () => {
+    expect(checkInteractions([])).toBe(false);
+    expect(checkInteractions(['warfarin'])).toBe(false);
+  });
+
+  it('should detect interactions within a larger list of medicines', () => {
+    expect(checkInteractions(['paracetamol', 'warfarin', 'omeprazole', 'aspirin'])).toBe(true);
+  });
+
+  it('should return false for a larger list of medicines with no interactions', () => {
+    expect(checkInteractions(['paracetamol', 'omeprazole', 'amoxicillin', 'lisinopril'])).toBe(false);
   });
 });
