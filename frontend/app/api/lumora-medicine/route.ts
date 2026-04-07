@@ -21,7 +21,7 @@ const validateInput = <T>(schema: z.ZodSchema<T>, data: unknown) => {
 
 // Inline logger for API routes
 const logger = {
-  error: (message: string, meta: Record<string, any> = {}) => {
+  error: (message: string, meta: Record<string, unknown> = {}) => {
     console.error(JSON.stringify({
       level: 'error',
       message,
@@ -29,7 +29,7 @@ const logger = {
       ...meta
     }));
   },
-  warn: (message: string, meta: Record<string, any> = {}) => {
+  warn: (message: string, meta: Record<string, unknown> = {}) => {
     console.warn(JSON.stringify({
       level: 'warn', 
       message,
@@ -37,7 +37,7 @@ const logger = {
       ...meta
     }));
   },
-  info: (message: string, meta: Record<string, any> = {}) => {
+  info: (message: string, meta: Record<string, unknown> = {}) => {
     console.log(JSON.stringify({
       level: 'info',
       message, 
@@ -133,17 +133,20 @@ Use simple, universal language that anyone can understand. Avoid medical jargon.
 
     return NextResponse.json({ result });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
     // Handle validation errors specifically
-    if (error.message?.includes('Validation failed')) {
-      logger.warn('Medicine validation failed', { requestId, error: error.message });
-      return NextResponse.json({ error: error.message.replace('Validation failed: ', '') }, { status: 400 });
+    if (errorMessage.includes('Validation failed')) {
+      logger.warn('Medicine validation failed', { requestId, error: errorMessage });
+      return NextResponse.json({ error: errorMessage.replace('Validation failed: ', '') }, { status: 400 });
     }
     
     logger.error('Medicine endpoint error', {
       requestId,
-      error: error.message,
-      stack: error.stack
+      error: errorMessage,
+      stack: errorStack
     });
     
     return NextResponse.json({ 

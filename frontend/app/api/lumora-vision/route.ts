@@ -12,8 +12,8 @@ const visionSchema = z.object({
 });
 
 const logger = {
-  error: (msg: string, meta: any = {}) => console.error(JSON.stringify({ level: 'error', msg, ...meta })),
-  info: (msg: string, meta: any = {}) => console.log(JSON.stringify({ level: 'info', msg, ...meta }))
+  error: (msg: string, meta: Record<string, unknown> = {}) => console.error(JSON.stringify({ level: 'error', msg, ...meta })),
+  info: (msg: string, meta: Record<string, unknown> = {}) => console.log(JSON.stringify({ level: 'info', msg, ...meta }))
 };
 
 export const dynamic = 'force-dynamic';
@@ -93,12 +93,14 @@ Be concise and focused. Format response clearly with sections and bullet points.
 
     return NextResponse.json({ success: true, content, context });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
     }
     
-    logger.error('Vision endpoint error', { requestId, error: error.message });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    logger.error('Vision endpoint error', { requestId, error: errorMessage });
     return NextResponse.json({ error: "Analysis failed" }, { status: 500 });
   }
 }
