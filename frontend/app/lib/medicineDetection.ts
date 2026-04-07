@@ -102,14 +102,13 @@ export const checkInteractions = (medicines: string[]): boolean => {
     ['tramadol', 'sertraline']
   ];
 
-  for (let i = 0; i < medicines.length; i++) {
-    for (let j = i + 1; j < medicines.length; j++) {
-      const pair = [medicines[i].toLowerCase(), medicines[j].toLowerCase()].sort();
-      const hasInteraction = interactions.some(([a, b]) => 
-        (pair[0] === a && pair[1] === b) || (pair[0] === b && pair[1] === a)
-      );
-      if (hasInteraction) return true;
+  const medicineSet = new Set(medicines.map(m => m.toLowerCase()));
+
+  for (const [medA, medB] of interactions) {
+    if (medicineSet.has(medA) && medicineSet.has(medB)) {
+      return true;
     }
   }
+
   return false;
 };
