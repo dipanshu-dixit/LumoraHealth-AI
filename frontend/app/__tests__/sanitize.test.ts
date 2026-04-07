@@ -48,6 +48,12 @@ describe('sanitize library', () => {
       expect(sanitizeText('')).toBe('');
       // @ts-ignore
       expect(sanitizeText(null)).toBe('');
+      // @ts-ignore
+      expect(sanitizeText(undefined)).toBe('');
+      // @ts-ignore
+      expect(sanitizeText(123)).toBe('');
+      // @ts-ignore
+      expect(sanitizeText({})).toBe('');
     });
 
     test('strips all HTML tags', () => {
@@ -55,9 +61,29 @@ describe('sanitize library', () => {
       expect(sanitizeText(input)).toBe('Bold Italic Paragraph');
     });
 
+    test('strips HTML tags with attributes', () => {
+      const input = '<a href="https://example.com" class="link">Link</a> <img src="image.png" alt="img">';
+      expect(sanitizeText(input)).toBe('Link ');
+    });
+
+    test('handles self-closing HTML tags', () => {
+      const input = 'Line 1<hr/>Line 2<br />Line 3';
+      expect(sanitizeText(input)).toBe('Line 1Line 2Line 3');
+    });
+
     test('replaces newlines with <br>', () => {
       const input = 'Line 1\nLine 2\nLine 3';
       expect(sanitizeText(input)).toBe('Line 1<br>Line 2<br>Line 3');
+    });
+
+    test('handles multiple consecutive newlines', () => {
+      const input = 'Line 1\n\nLine 2\n\n\nLine 3';
+      expect(sanitizeText(input)).toBe('Line 1<br><br>Line 2<br><br><br>Line 3');
+    });
+
+    test('handles combinations of HTML tags and newlines', () => {
+      const input = '<h1>Title</h1>\n<p>Some text</p>\n<ul><li>Item</li></ul>';
+      expect(sanitizeText(input)).toBe('Title<br>Some text<br>Item');
     });
   });
 
