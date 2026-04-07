@@ -111,10 +111,15 @@ class ChatStorageService {
       if (!stored) return [];
       const chats = JSON.parse(stored);
       
+      const seen = new Set();
       return chats
-        .filter((chat: any, index: number, self: any[]) => 
-          chat.id && index === self.findIndex(c => c.id === chat.id)
-        )
+        .filter((chat: any) => {
+          if (chat.id && !seen.has(chat.id)) {
+            seen.add(chat.id);
+            return true;
+          }
+          return false;
+        })
         .map((chat: any) => ({
           ...chat,
           timestamp: new Date(chat.timestamp),
