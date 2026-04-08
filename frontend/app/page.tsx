@@ -279,6 +279,17 @@ export default function Home() {
 		setInput('');
 	}, [input]);
 
+	const getCSRFToken = async () => {
+		try {
+			const res = await fetch('/api/csrf-token');
+			const data = await res.json();
+			return data.csrfToken;
+		} catch (error) {
+			console.error('Failed to get CSRF token', error);
+			return '';
+		}
+	};
+
 	// Optimized AI request with better error handling
 	const sendToAI = useCallback(async (message: string) => {
 		try {
@@ -295,9 +306,14 @@ export default function Home() {
 			const controller = new AbortController();
 			const timeoutId = setTimeout(() => controller.abort(), 30000);
 
+			const csrfToken = await getCSRFToken();
+
 			const response = await fetch('/api/lumora-chat', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+					'x-csrf-token': csrfToken
+				},
 				body: JSON.stringify({
 					message,
 					history: messages.slice(-contextWindow).map(m => ({ role: m.isUser ? 'user' : 'assistant', content: m.content })),

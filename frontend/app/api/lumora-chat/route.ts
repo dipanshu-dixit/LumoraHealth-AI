@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { logger } from '../../lib/logger';
+import { cookies } from 'next/headers';
 
 // Inline validation schemas
 const chatMessageSchema = z.object({
@@ -35,12 +36,54 @@ const validateInput = <T>(schema: z.ZodSchema<T>, data: unknown) => {
   return result.data;
 };
 
+const rateLimit = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 20;
+const WINDOW = 60 * 1000;
+
+// Periodic cleanup to prevent memory exhaustion
+const cleanupInterval = setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of rateLimit.entries()) {
+    if (now > entry.resetTime) {
+      rateLimit.delete(key);
+    }
+  }
+}, WINDOW);
+
+// Allow interval to unref so it doesn't block process exit if applicable
+if (cleanupInterval.unref) cleanupInterval.unref();
+
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   const requestId = Date.now().toString(36);
   
   try {
+    // CSRF Authentication Check
+    const csrfHeader = req.headers.get('x-csrf-token');
+    const cookieStore = await cookies();
+    const csrfCookie = cookieStore.get('csrf_token');
+
+    if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie.value) {
+      logger.warn('CSRF token validation failed', { requestId });
+      return NextResponse.json({ error: 'Invalid or missing CSRF token' }, { status: 403 });
+    }
+
+    // Implement IP-based rate limiting
+    const ip = req.headers.get('x-forwarded-for') || 'anonymous';
+    const now = Date.now();
+    const userLimit = rateLimit.get(ip);
+
+    if (!userLimit || now > userLimit.resetTime) {
+      rateLimit.set(ip, { count: 1, resetTime: now + WINDOW });
+    } else {
+      userLimit.count++;
+      if (userLimit.count > RATE_LIMIT) {
+        logger.warn('Rate limit exceeded for chat API', { ip, requestId });
+        return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+      }
+    }
+
     const body = await req.json().catch(() => {
       throw new Error('Invalid JSON in request body');
     });
