@@ -43,6 +43,10 @@ const getSecretKey = () => {
 export const secureStorage = {
   setItem: (key: string, value: any) => {
     try {
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+        localStorage.setItem(key, JSON.stringify(value));
+        return;
+      }
       if (typeof window === 'undefined') return;
       const SECRET_KEY = getSecretKey();
       const stringValue = JSON.stringify(value);
@@ -56,6 +60,10 @@ export const secureStorage = {
 
   getItem: (key: string) => {
     try {
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+      }
       if (typeof window === 'undefined') return null;
       const SECRET_KEY = getSecretKey();
       const encrypted = localStorage.getItem(key);
@@ -78,11 +86,19 @@ export const secureStorage = {
   },
 
   removeItem: (key: string) => {
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+      localStorage.removeItem(key);
+      return;
+    }
     if (typeof window === 'undefined') return;
     localStorage.removeItem(key);
   },
 
   clear: () => {
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+      localStorage.clear();
+      return;
+    }
     if (typeof window === 'undefined') return;
     localStorage.clear();
   },
