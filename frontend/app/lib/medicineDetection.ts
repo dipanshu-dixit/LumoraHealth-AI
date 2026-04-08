@@ -62,6 +62,15 @@ const BLACKLIST_SET = new Set(BLACKLIST.map(word => word.toLowerCase()));
 // Optimization: Pre-compile smart detection regex
 const SMART_DETECTION_REGEX = /\b[A-Z][a-z]{4,}(?:pril|statin|mycin|cillin|oxin|azole|mab|tinib|afil|dipine|sartan|olol|zole|pine|done|tide)\b/g;
 
+// Known dangerous interactions (module-level for performance)
+const DANGEROUS_INTERACTIONS: [string, string][] = [
+  ['warfarin', 'aspirin'],
+  ['warfarin', 'ibuprofen'],
+  ['metformin', 'alcohol'],
+  ['alprazolam', 'alcohol'],
+  ['tramadol', 'sertraline']
+];
+
 export const detectMedicines = (text: string): string[] => {
   const lowerText = text.toLowerCase();
   const detected = new Set<string>();
@@ -103,22 +112,11 @@ export const detectMedicines = (text: string): string[] => {
 };
 
 export const checkInteractions = (medicines: string[]): boolean => {
-  // Known dangerous interactions
-  const interactions = [
-    ['warfarin', 'aspirin'],
-    ['warfarin', 'ibuprofen'],
-    ['metformin', 'alcohol'],
-    ['alprazolam', 'alcohol'],
-    ['tramadol', 'sertraline']
-  ];
+  if (medicines.length < 2) return false;
 
   const medicineSet = new Set(medicines.map(m => m.toLowerCase()));
 
-  for (const [medA, medB] of interactions) {
-    if (medicineSet.has(medA) && medicineSet.has(medB)) {
-      return true;
-    }
-  }
-
-  return false;
+  return DANGEROUS_INTERACTIONS.some(([a, b]) =>
+    medicineSet.has(a) && medicineSet.has(b)
+  );
 };

@@ -29,4 +29,9 @@ describe('validateImageFile', () => {
     const fileWithNoType = {} as File;
     expect(validateImageFile(fileWithNoType)).toBe(false);
   });
+
+  test('is case sensitive (standard MIME types are lowercase)', () => {
+    const file = createMockFile('IMAGE/PNG');
+    expect(validateImageFile(file)).toBe(false);
+  });
 });

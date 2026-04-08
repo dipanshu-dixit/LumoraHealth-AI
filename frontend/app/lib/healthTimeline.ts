@@ -48,6 +48,13 @@ export interface HealthInsight {
   category: 'symptom' | 'medication' | 'lifestyle';
 }
 
+// Module-level constants for symptom/medication detection (pre-compiled for performance)
+const SYMPTOM_KEYWORDS = ['pain', 'headache', 'fever', 'cough', 'fatigue', 'nausea', 'dizzy', 'ache'];
+const MEDICATION_KEYWORDS = ['taking', 'prescribed', 'medication', 'pill', 'tablet', 'dose'];
+const SYMPTOM_REGEX = new RegExp(`(${SYMPTOM_KEYWORDS.join('|')})`);
+const MEDICATION_REGEX = new RegExp(`(${MEDICATION_KEYWORDS.join('|')})`, 'i');
+const MED_NAME_REGEX = /\b[A-Z][a-z]+(?:in|ol|ex|am)\b/;
+
 class HealthTimelineService {
   private static instance: HealthTimelineService;
 
@@ -57,7 +64,6 @@ class HealthTimelineService {
     }
     return HealthTimelineService.instance;
   }
-
   async extractHealthData(chats: ChatSession[]): Promise<{
     symptoms: SymptomEntry[];
     medications: MedicationEntry[];
@@ -89,26 +95,26 @@ class HealthTimelineService {
     const medications = new Map<string, { startDate: Date, frequency: string }>();
     const lifestyle = { sleep: [], exercise: [], stress: [] };
 
-    const symptomKeywords = ['pain', 'headache', 'fever', 'cough', 'fatigue', 'nausea', 'dizzy', 'ache'];
-    const medicationKeywords = ['taking', 'prescribed', 'medication', 'pill', 'tablet', 'dose'];
-
     chats.forEach(chat => {
       chat.messages.forEach(msg => {
         if (!msg.isUser) return;
-        const content = msg.content.toLowerCase();
 
-        symptomKeywords.forEach(symptom => {
-          if (content.includes(symptom)) {
-            if (!symptoms.has(symptom)) {
-              symptoms.set(symptom, { dates: [], severity: [] });
+        const contentLower = msg.content.toLowerCase();
+
+        if (SYMPTOM_REGEX.test(contentLower)) {
+          SYMPTOM_KEYWORDS.forEach(symptom => {
+            if (contentLower.includes(symptom)) {
+              if (!symptoms.has(symptom)) {
+                symptoms.set(symptom, { dates: [], severity: [] });
+              }
+              symptoms.get(symptom)!.dates.push(msg.timestamp);
+              symptoms.get(symptom)!.severity.push(this.estimateSeverity(contentLower));
             }
-            symptoms.get(symptom)!.dates.push(msg.timestamp);
-            symptoms.get(symptom)!.severity.push(this.estimateSeverity(content));
-          }
-        });
+          });
+        }
 
-        if (medicationKeywords.some(kw => content.includes(kw))) {
-          const medMatch = content.match(/\b[A-Z][a-z]+(?:in|ol|ex|am)\b/);
+        if (MEDICATION_REGEX.test(contentLower)) {
+          const medMatch = msg.content.match(MED_NAME_REGEX);
           if (medMatch) {
             const medName = medMatch[0];
             if (!medications.has(medName)) {

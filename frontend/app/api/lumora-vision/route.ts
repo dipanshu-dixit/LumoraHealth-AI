@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { logger } from '../../lib/logger';
+import { sanitizeApiError } from '../../src/lib/errorUtils';
 
 const visionSchema = z.object({
   image: z.string().min(1, 'Image data required'),
@@ -73,7 +74,7 @@ Be concise and focused. Format response clearly with sections and bullet points.
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error('xAI Vision API error', { requestId, status: response.status, error: errorText });
+      logger.error('xAI Vision API error', { requestId, status: response.status, error: sanitizeApiError(errorText) });
       return NextResponse.json({ error: "Vision analysis unavailable" }, { status: 503 });
     }
 
@@ -89,12 +90,12 @@ Be concise and focused. Format response clearly with sections and bullet points.
 
     return NextResponse.json({ success: true, content, context });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
     }
-    
-    logger.error('Vision endpoint error', { requestId, error: error.message });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Vision endpoint error', { requestId, error: errorMessage });
     return NextResponse.json({ error: "Analysis failed" }, { status: 500 });
   }
 }
