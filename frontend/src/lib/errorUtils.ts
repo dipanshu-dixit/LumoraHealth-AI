@@ -19,8 +19,8 @@ export function sanitizeApiError(error: unknown): string {
     }
   }
 
-  // Redact Bearer tokens
-  errorMessage = errorMessage.replace(/Bearer\s+[a-zA-Z0-9\-\._~\+\/]+=*/gi, 'Bearer [REDACTED]');
+  // Redact Bearer tokens (standard JWT/API token format)
+  errorMessage = errorMessage.replace(/Bearer\s+[\w\-\.]+/gi, 'Bearer [REDACTED]');
 
   // Redact API keys in various formats (e.g., "api_key": "...", api-key: ..., etc.)
   errorMessage = errorMessage.replace(/(api[_-]?key|access[_-]?token|secret|password|auth[_-]?token|x-api-key)([:=]\s*|["']:\s*["'])[\w\-\._~\+\/]+/gi, '$1$2[REDACTED]');

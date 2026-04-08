@@ -135,7 +135,7 @@ describe('Performance Monitoring', () => {
       // for 'errors' and check its length.
 
       // Add 1005 errors
-      for(let i = 0; i < 1005; i++) {
+      for (let i = 0; i < 1005; i++) {
         trackMetric('errors', i, { test: i });
       }
 
