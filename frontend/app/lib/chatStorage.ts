@@ -12,6 +12,7 @@ export interface ChatSession {
   }>;
   rating?: 'up' | 'down';
   pinned?: boolean;
+  category?: string;
 }
 
 export interface HealthInsight {
@@ -112,6 +113,7 @@ class ChatStorageService {
       id,
       topic: smartTopic,
       timestamp: new Date(),
+      category: this.categorizeChat(smartTopic),
       messages: messages.map(m => ({
         id: m.id,
         content: m.content,
@@ -233,7 +235,7 @@ class ChatStorageService {
     const categories: { [key: string]: { count: number; lastDiscussed: Date } } = {};
 
     chats.forEach(chat => {
-      const category = this.categorizeChat(chat.topic);
+      const category = chat.category || this.categorizeChat(chat.topic);
       if (!categories[category]) {
         categories[category] = { count: 0, lastDiscussed: chat.timestamp };
       }

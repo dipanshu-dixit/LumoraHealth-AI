@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { logger } from '../../lib/logger';
+import { sanitizeApiError } from '../../src/lib/errorUtils';
 
 // Inline validation schemas
 const chatMessageSchema = z.object({
@@ -136,7 +137,7 @@ ${validatedData.adaptiveProfile.topicsOfInterest.length > 0 ? `- Topics of inter
       logger.error('xAI API error', { 
         requestId,
         status: response.status,
-        error: errorText 
+        error: sanitizeApiError(errorText) 
       });
       
       if (response.status === 429) {
@@ -174,17 +175,20 @@ ${validatedData.adaptiveProfile.topicsOfInterest.length > 0 ? `- Topics of inter
       thinking
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
     // Handle validation errors specifically
-    if (error.message?.includes('Validation failed')) {
-      logger.warn('Input validation failed', { requestId, error: error.message });
-      return NextResponse.json({ error: error.message.replace('Validation failed: ', '') }, { status: 400 });
+    if (errorMessage.includes('Validation failed')) {
+      logger.warn('Input validation failed', { requestId, error: errorMessage });
+      return NextResponse.json({ error: errorMessage.replace('Validation failed: ', '') }, { status: 400 });
     }
     
     logger.error('Chat endpoint error', {
       requestId,
-      error: error.message,
-      stack: error.stack
+      error: errorMessage,
+      stack: errorStack
     });
     
     return NextResponse.json({ 

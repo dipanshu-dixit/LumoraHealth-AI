@@ -2,44 +2,21 @@ import { sanitizeInput, sanitizeText, sanitizeChatMessage } from '../lib/sanitiz
 
 describe('sanitize library', () => {
   describe('sanitizeInput', () => {
-    test('returns empty string for non-string or empty input', () => {
-      expect(sanitizeInput('')).toBe('');
+    test.each([
+      ['', ''],
+      [null, ''],
+      [undefined, ''],
+      [123, ''],
+      ['Hello <script>alert("xss")</script> World', 'Hello  World'],
+      ['Check this <iframe src="http://evil.com"></iframe>', 'Check this'],
+      ['<object>bad</object><embed src="bad">', ''],
+      ['<div onclick="alert(1)" onmouseover="run()">Content</div>', '<div  >Content</div>'],
+      ['<a href="javascript:alert(1)">Link</a> <img src="data:text/html,bad">', '<a href="alert(1)">Link</a> <img src=",bad">'],
+      ['   hello world   ', 'hello world'],
+      ['Safe <p>text</p>', 'Safe <p>text</p>'],
+    ])('should sanitize input correctly', (input, expected) => {
       // @ts-ignore
-      expect(sanitizeInput(null)).toBe('');
-      // @ts-ignore
-      expect(sanitizeInput(undefined)).toBe('');
-      // @ts-ignore
-      expect(sanitizeInput(123)).toBe('');
-    });
-
-    test('removes <script> tags and content', () => {
-      const input = 'Hello <script>alert("xss")</script> World';
-      expect(sanitizeInput(input)).toBe('Hello  World');
-    });
-
-    test('removes <iframe> tags', () => {
-      const input = 'Check this <iframe src="http://evil.com"></iframe>';
-      expect(sanitizeInput(input)).toBe('Check this');
-    });
-
-    test('removes <object> and <embed> tags', () => {
-      const input = '<object>bad</object><embed src="bad">';
-      expect(sanitizeInput(input)).toBe('');
-    });
-
-    test('removes on* event handlers', () => {
-      const input = '<div onclick="alert(1)" onmouseover="run()">Content</div>';
-      expect(sanitizeInput(input)).toBe('<div  >Content</div>');
-    });
-
-    test('removes javascript: and data:text/html URIs', () => {
-      const input = '<a href="javascript:alert(1)">Link</a> <img src="data:text/html,bad">';
-      expect(sanitizeInput(input)).toBe('<a href="alert(1)">Link</a> <img src=",bad">');
-    });
-
-    test('trims the result', () => {
-      const input = '   hello world   ';
-      expect(sanitizeInput(input)).toBe('hello world');
+      expect(sanitizeInput(input)).toBe(expected);
     });
   });
 
