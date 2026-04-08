@@ -25,6 +25,7 @@ class ChatStorageService {
   private readonly STORAGE_KEY = STORAGE_KEYS.CHAT_HISTORY;
   private saveQueue: Map<string, any> = new Map();
   private saveTimeout: number | null = null;
+  private memoryCache: ChatSession[] | null = null;
 
   static getInstance(): ChatStorageService {
     if (!ChatStorageService.instance) {
@@ -106,13 +107,20 @@ class ChatStorageService {
   }
 
   getAllChats(): ChatSession[] {
+    if (this.memoryCache !== null) {
+      return this.memoryCache;
+    }
+
     try {
       const stored = storage.get(this.STORAGE_KEY);
-      if (!stored) return [];
+      if (!stored) {
+        this.memoryCache = [];
+        return this.memoryCache;
+      }
       const chats = JSON.parse(stored);
       
       const seen = new Set();
-      return chats
+      this.memoryCache = chats
         .filter((chat: any) => {
           if (chat.id && !seen.has(chat.id)) {
             seen.add(chat.id);
@@ -123,14 +131,16 @@ class ChatStorageService {
         .map((chat: any) => ({
           ...chat,
           timestamp: new Date(chat.timestamp),
-          messages: chat.messages.map((m: any) => ({
+          messages: (chat.messages || []).map((m: any) => ({
             ...m,
             timestamp: new Date(m.timestamp)
           }))
         }));
+      return this.memoryCache as ChatSession[];
     } catch (error) {
       console.error('Failed to load chat history:', error);
-      return [];
+      this.memoryCache = [];
+      return this.memoryCache;
     }
   }
 
@@ -139,6 +149,7 @@ class ChatStorageService {
     const chatIndex = chats.findIndex(c => c.id === chatId);
     if (chatIndex !== -1) {
       chats[chatIndex].topic = newTopic;
+      this.memoryCache = chats;
       storage.set(this.STORAGE_KEY, JSON.stringify(chats));
     }
   }
@@ -148,6 +159,7 @@ class ChatStorageService {
     const chatIndex = chats.findIndex(c => c.id === chatId);
     if (chatIndex !== -1) {
       chats[chatIndex].pinned = !chats[chatIndex].pinned;
+      this.memoryCache = chats;
       storage.set(this.STORAGE_KEY, JSON.stringify(chats));
     }
   }
@@ -157,16 +169,19 @@ class ChatStorageService {
     const chatIndex = chats.findIndex(c => c.id === chatId);
     if (chatIndex !== -1) {
       chats[chatIndex].rating = rating;
+      this.memoryCache = chats;
       storage.set(this.STORAGE_KEY, JSON.stringify(chats));
     }
   }
 
   deleteChat(chatId: string) {
     const chats = this.getAllChats().filter(c => c.id !== chatId);
+    this.memoryCache = chats;
     storage.set(this.STORAGE_KEY, JSON.stringify(chats));
   }
 
   clearAllChats() {
+    this.memoryCache = [];
     storage.remove(this.STORAGE_KEY);
   }
 
