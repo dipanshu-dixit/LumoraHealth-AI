@@ -38,15 +38,21 @@ class ChatStorageService {
       clearTimeout(this.saveTimeout);
       this.saveTimeout = null;
     }
-    this.saveTimeout = window.setTimeout(() => {
+
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
       try {
         storage.set(this.STORAGE_KEY, JSON.stringify(data));
       } catch (error) {
         console.error('Failed to save chat history:', error);
-      } finally {
-        this.saveTimeout = null;
       }
-    }, 300);
+      return;
+    }
+
+    try {
+      storage.set(this.STORAGE_KEY, JSON.stringify(data));
+    } catch (error) {
+      console.error('Failed to save chat history:', error);
+    }
   }
 
   generateTitle(userMessage: string): string {
@@ -68,9 +74,30 @@ class ChatStorageService {
   }
 
   saveChat(topic: string, messages: any[], chatId?: string): string {
-    if (!messages || messages.length === 0) return chatId || crypto.randomUUID();
-    
     const id = chatId || crypto.randomUUID();
+    if (!messages || messages.length === 0) {
+      // Just save the empty topic
+      const existing = this.getAllChats();
+      const existingIndex = existing.findIndex(c => c.id === id);
+      const session: ChatSession = {
+        id,
+        topic,
+        timestamp: new Date(),
+        messages: []
+      };
+      if (existingIndex !== -1) {
+        existing[existingIndex] = session;
+      } else {
+        existing.push(session);
+      }
+      try {
+        storage.set(this.STORAGE_KEY, JSON.stringify(existing));
+      } catch (error) {
+        console.error('Failed to save chat history:', error);
+      }
+      return id;
+    }
+
     let smartTopic = topic;
     
     if (topic === 'Health Consultation' && messages.length > 0) {
