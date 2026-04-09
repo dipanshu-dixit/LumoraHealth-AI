@@ -224,7 +224,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 exit={{ opacity: 0, y: 10 }}
                 className="mb-3 flex justify-start"
               >
-                <div className="relative inline-block">
+                <div className="relative inline-block mt-3 mr-3">
                   <img
                     src={imagePreview}
                     alt="Selected"
@@ -233,7 +233,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   <button
                     type="button"
                     onClick={() => setSelectedFile(null)}
-                    className="absolute -top-2 -right-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-full p-1 shadow-lg"
+                    className="absolute -top-3 -right-3 bg-zinc-800 hover:bg-red-500 hover:text-white text-zinc-300 rounded-full p-1.5 shadow-lg border border-zinc-700 transition-colors z-10"
                   >
                     <X size={14} />
                   </button>

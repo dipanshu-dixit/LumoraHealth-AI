@@ -197,22 +197,26 @@ export default function Timeline() {
               <h1 className="text-3xl font-bold text-white mb-2">Health Timeline</h1>
               <p className="text-zinc-400">Longitudinal health intelligence from your conversations</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               {dataLoaded && (
                 <button
                   onClick={loadHealthData}
                   disabled={loading}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 text-white rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 disabled:bg-zinc-800/50 text-white rounded-lg transition-all text-sm font-medium"
                 >
-                  <Activity className="w-4 h-4" />
+                  {loading ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Activity className="w-4 h-4 text-purple-400" />
+                  )}
                   {loading ? 'Refreshing...' : 'Refresh Report'}
                 </button>
               )}
               <button
                 onClick={exportToPDF}
-                className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-zinc-100 text-black rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white rounded-lg transition-all text-sm font-medium"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4 text-zinc-400" />
                 Export Summary
               </button>
             </div>

@@ -148,16 +148,16 @@ const SentientInput = React.memo<SentientInputProps>(({
 					{/* Image Preview */}
 					{imagePreview && (
 						<div className="p-4 pb-2">
-							<div className="relative inline-block">
+							<div className="relative inline-block mt-3 mr-3">
 								<img
 									src={imagePreview}
 									alt="Selected image"
-									className="max-w-[200px] max-h-[150px] rounded-lg object-cover"
+									className="max-w-[200px] max-h-[150px] rounded-lg object-cover border border-white/10"
 								/>
 								<motion.button
 									type="button"
 									onClick={removeImage}
-									className="absolute -top-2 -right-2 bg-gray-600 hover:bg-gray-700 text-black rounded-full p-1 shadow-lg"
+									className="absolute -top-3 -right-3 bg-zinc-800 hover:bg-red-500 text-zinc-300 hover:text-white rounded-full p-1.5 shadow-xl border border-zinc-700 transition-colors z-10"
 									whileHover={{ scale: 1.1 }}
 									whileTap={{ scale: 0.9 }}
 								>

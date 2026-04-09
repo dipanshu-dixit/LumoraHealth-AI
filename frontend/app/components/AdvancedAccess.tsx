@@ -54,9 +54,9 @@ Please approve my access to help improve Lumora.
 
 Thank you!`);
       
-      // Open Gmail compose with pre-filled details
-      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=dipanshudixit206@gmail.com&su=${subject}&body=${body}`;
-      window.open(gmailUrl, '_blank');
+      // Open default mail client with pre-filled details
+      const mailtoLink = `mailto:dipanshudixit206@gmail.com?subject=${subject}&body=${body}`;
+      window.location.href = mailtoLink;
       
       setIsSubmitted(true);
       localStorage.setItem('lumora-access-requested', 'true');
