@@ -360,22 +360,26 @@ export default function Dashboard() {
               </h1>
               <p className="text-zinc-400">Your personalized wellness dashboard</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               {dataLoaded && (
                 <button
                   onClick={loadHealthTimeline}
                   disabled={loading}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 text-white rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 disabled:bg-zinc-800/50 text-white rounded-lg transition-all text-sm font-medium"
                 >
-                  <Brain className="w-4 h-4" />
+                  {loading ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Brain className="w-4 h-4 text-purple-400" />
+                  )}
                   {loading ? 'Analyzing...' : 'Refresh AI'}
                 </button>
               )}
               <button
                 onClick={exportSummary}
-                className="hidden md:flex items-center gap-2 px-4 py-2 bg-white hover:bg-zinc-100 text-black rounded-lg transition-colors"
+                className="hidden md:flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white rounded-lg transition-all text-sm font-medium"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4 text-zinc-400" />
                 Export Report
               </button>
             </div>
@@ -394,9 +398,13 @@ export default function Dashboard() {
               <button
                 onClick={loadHealthTimeline}
                 disabled={loading}
-                className="px-6 py-3 bg-white hover:bg-zinc-100 disabled:bg-zinc-800 text-black disabled:text-zinc-600 rounded-lg font-medium transition-colors flex items-center gap-2 mx-auto"
+                className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:from-zinc-800 disabled:to-zinc-800 text-white disabled:text-zinc-500 rounded-lg font-medium transition-all flex items-center gap-2 mx-auto shadow-lg shadow-purple-900/20"
               >
-                <Sparkles className="w-5 h-5" />
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Sparkles className="w-5 h-5" />
+                )}
                 {loading ? 'Analyzing...' : 'Analyze My Health'}
               </button>
             </motion.div>
@@ -482,8 +490,8 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-400 mx-auto mb-4"></div>
-                    <p className="text-zinc-400">Analyzing your health patterns...</p>
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-400 mx-auto mb-3"></div>
+                    <p className="text-sm text-zinc-500">Processing health data...</p>
                   </div>
                 </div>
               </motion.div>

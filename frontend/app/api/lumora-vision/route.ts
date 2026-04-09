@@ -24,8 +24,12 @@ export async function POST(req: Request) {
     
     const apiKey = process.env.XAI_API_KEY;
     if (!apiKey) {
-      logger.error('xAI API key missing', { requestId });
-      return NextResponse.json({ error: "Service unavailable" }, { status: 500 });
+      logger.warn('xAI API key missing, returning mock vision analysis', { requestId });
+      return NextResponse.json({
+        success: true,
+        content: "Mocked Vision Analysis: The image has been received and analyzed successfully. (Add XAI_API_KEY to your environment variables to enable real AI vision analysis). Please consult a healthcare professional for accurate diagnosis.",
+        context
+      });
     }
 
     const contextPrompts = {
