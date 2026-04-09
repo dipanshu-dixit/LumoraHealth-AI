@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { logger } from '../../lib/logger';
-import { sanitizeApiError } from '../../src/lib/errorUtils';
+import { sanitizeApiError } from '../../../src/lib/errorUtils';
 
 // Inline validation schemas
 const medicineSearchSchema = z.object({
