@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { logger } from '../../lib/logger';
-import { sanitizeApiError } from '../../src/lib/errorUtils';
+import { sanitizeApiError } from '../../../src/lib/errorUtils';
 
 const visionSchema = z.object({
   image: z.string().min(1, 'Image data required'),
